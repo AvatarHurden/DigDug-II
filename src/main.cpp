@@ -54,12 +54,9 @@ void initSound();
 void initTexture();
 void initModel();
 void initLight();
-void enableFog();
 void createGLUI();
 void mainRender();
 void mainCreateMenu();
-void onMouseButton(int button, int state, int x, int y);
-void onMouseMove(int x, int y);
 void onKeyDown(unsigned char key, int x, int y);
 void onKeyUp(unsigned char key, int x, int y);
 void onGLUIEvent(int id);
@@ -91,15 +88,14 @@ double yOffset = -1.3;
 int mouseLastX = 0;
 int mouseLastY = 0;
 
-float roty = 0.0f;
+int roty = 0;
 float rotx = 90.0f;
 
-bool rightPressed = false;
-bool leftPressed = false;
 bool upPressed = false;
 bool downPressed = false;
 
-bool spacePressed = false;
+bool turningLeft = false;
+bool turningRight = false;
 
 float speedX = 0.0f;
 float speedY = 0.0f;
@@ -117,8 +113,6 @@ float lightZ = 0;
 variavel auxiliar pra dar variação na altura do ponto de vista ao andar.
 */
 float headPosAux = 0.0f;
-
-float maxSpeed = 0.25f;
 
 float planeSize = 8.0f;
 
@@ -152,12 +146,6 @@ GLubyte     temp;            /* Swapping variable */
 GLenum      type;            /* Texture type */
 GLuint      texture;         /* Texture object */
 
-bool crouched = false;
-bool running = false;
-bool jumping = false;
-float jumpSpeed = 0.06;
-float gravity = 0.004;
-float heightLimit = 0.2;
 float posYOffset = 0.2;
 
 float backgrundColor[4] = {0.0f,0.0f,0.0f,1.0f};
@@ -223,44 +211,22 @@ void updateCam() {
 	source0Pos[0] = posX;
 	source0Pos[1] = posY;
 	source0Pos[2] = posZ;
-
-    GLfloat light_position0[] = {posX, posY, posZ, 1.0 };
-    glLightfv(GL_LIGHT0, GL_POSITION, light_position0);
-    GLfloat dir[] = {sin(roty*PI/180), cos(rotx*PI/180), -cos(roty*PI/180)};
-    glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, dir);
-
-    GLfloat light_position1[] = {lightX, lightY, lightZ, 1.0 };
-    glPushMatrix();
-        glRotatef(lightX+=2,0.0,1.0,0.0);
-        glTranslatef(1.0,1.0,0.0);
-        glLightfv(GL_LIGHT1, GL_POSITION, light_position1);
-	glPopMatrix();
-
 }
 
 void initLight() {
     glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
-	glEnable(GL_LIGHT1);
 
 	GLfloat light_ambient[] = { backgrundColor[0], backgrundColor[1], backgrundColor[2], backgrundColor[3] };
 	GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
 	GLfloat light_specular[] = { 1.0, 1.0, 1.0, 1.0 };
-	GLfloat light_position0[] = {0.0, 0.0, 0.0, 1.0 };
+	GLfloat light_position0[] = {4.0, 4.0, 3.0, 1.0 };
 	GLfloat light_position1[] = {0.0, 0.0, 0.0, 1.0 };
 
 	glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
 	glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
 	glLightfv(GL_LIGHT0, GL_POSITION, light_position0);
-	glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 45.0);
-	glLightf(GL_LIGHT0, GL_SPOT_EXPONENT, 10.0);
-
-    glLightfv(GL_LIGHT1, GL_AMBIENT, light_ambient);
-	glLightfv(GL_LIGHT1, GL_DIFFUSE, light_diffuse);
-	glLightfv(GL_LIGHT1, GL_SPECULAR, light_specular);
-	glLightfv(GL_LIGHT0, GL_POSITION, light_position1);
-
 }
 
 void setViewport(GLint left, GLint right, GLint bottom, GLint top) {
@@ -287,8 +253,6 @@ void mainInit() {
 	initModel();
 
 	initLight();
-
-	enableFog();
 
 	printf("w - andar \n");
 	printf("s - ir pra tras \n");
@@ -467,18 +431,6 @@ void initTexture(void)
 
 }
 
-void enableFog(void)
-{
-    float fog_colour[4] = {1,1,1,1};
-    glEnable(GL_FOG);
-    glFogf(GL_FOG_MODE,GL_EXP2);
-    glFogfv(GL_FOG_COLOR,fog_colour);
-    glFogf(GL_FOG_DENSITY,0.15);
-    glHint(GL_FOG_HINT,GL_NICEST);
-    glFogf(GL_FOG_START,10);
-    glFogf(GL_FOG_END,100);
-}
-
 void renderFloor() {
 	// set things up to render the floor with the texture
 	glShadeModel(GL_SMOOTH);
@@ -547,31 +499,26 @@ void renderScene() {
 
 void updateState() {
 
-//    if (leftPressed || rightPressed){
-//        speedX = 0.05 * cos(roty*PI/180);
-//        speedZ = -0.05 * sin(roty*PI/180);
-//        if (running){
-//            speedZ *= 2;
-//            speedX *= 2;
-//        }
-//        if (rightPressed) {
-//            posX += speedX;
-//            posZ += speedZ;
-//        } else {
-//            posX -= speedX;
-//            posZ -= speedZ;
-//        }
-//    }
+    if (turningRight || turningLeft) {
+        if (turningRight) {
+            roty += 2;
+            if (roty % 90 == 0)
+                turningRight = false;
+        } else if (turningLeft) {
+            roty -= 2;
+            if (roty % 90 == 0)
+                turningLeft = false;
+        }
 
-	if (upPressed || downPressed) {
+        if (roty >= 360)
+            roty -= 360;
+        else if (roty <= 0)
+            roty += 360;
 
-		if (running) {
-			speedX = 0.05 * sin(roty*PI/180) * 2;
-			speedZ = -0.05 * cos(roty*PI/180) * 2;
-		} else {
-			speedX = 0.05 * sin(roty*PI/180);
-			speedZ = -0.05 * cos(roty*PI/180);
-		}
+    } else if (upPressed || downPressed) {
+
+        speedX = 0.05 * sin(roty*PI/180);
+		speedZ = -0.05 * cos(roty*PI/180);
 
 		// efeito de "sobe e desce" ao andar
 		headPosAux += 8.5f;
@@ -593,27 +540,6 @@ void updateState() {
 		headPosAux -= 4.0f;
 		if (headPosAux < 0.0f) {
 			headPosAux = 0.0f;
-		}
-	}
-
-	posY += speedY;
-	if (posY < heightLimit) {
-		posY = heightLimit;
-		speedY = 0.0f;
-		jumping = false;
-	} else {
-		speedY -= gravity;
-	}
-
-	if (crouched) {
-		posYOffset -= 0.01;
-		if (posYOffset < 0.1) {
-			posYOffset = 0.1;
-		}
-	} else {
-		posYOffset += 0.01;
-		if (posYOffset > 0.2) {
-			posYOffset = 0.2;
 		}
 	}
 
@@ -653,60 +579,11 @@ void mainCreateMenu() {
 }
 
 /**
-Mouse button event handler
-*/
-void onMouseButton(int button, int state, int x, int y) {
-	//printf("onMouseButton button: %d \n", button);
-	glutPostRedisplay();
-}
-
-/**
-Mouse move while button pressed event handler
-*/
-void onMouseMove(int x, int y) {
-
-	/*mouseLastX = x;
-	mouseLastY = y;*/
-
-	glutPostRedisplay();
-}
-
-/**
-Mouse move with no button pressed event handler
-*/
-void onMousePassiveMove(int x, int y) {
-
-	roty += (x - mouseLastX);
-
-	rotx -= (y - mouseLastY);
-
-	if (rotx < -128.0) {
-		rotx = -128.0;
-	}
-
-	if (rotx > -45.0) {
-		rotx = -45.0;
-	}
-
-	mouseLastX = x;
-	mouseLastY = y;
-
-	//glutPostRedisplay();
-}
-
-/**
 Key press event handler
 */
 void onKeyDown(unsigned char key, int x, int y) {
 	//printf("%d \n", key);
 	switch (key) {
-		case 32: //space
-			if (!spacePressed && !jumping) {
-				jumping = true;
-				speedY = jumpSpeed;
-			}
-			spacePressed = true;
-			break;
 		case 119: //w
 			if (!upPressed) {
 				alSourcePlay(source[0]);
@@ -717,16 +594,12 @@ void onKeyDown(unsigned char key, int x, int y) {
 			downPressed = true;
 			break;
 		case 97: //a
-			leftPressed = true;
+            if (!turningRight)
+                turningLeft = true;
 			break;
 		case 100: //d
-			rightPressed = true;
-			break;
-		case 99: //c
-			crouched = true;
-			break;
-		case 114: //r
-			running = true;
+		    if (!turningLeft)
+                turningRight = true;
 			break;
 		default:
 			break;
@@ -740,9 +613,6 @@ Key release event handler
 */
 void onKeyUp(unsigned char key, int x, int y) {
 	switch (key) {
-		case 32: //space
-			spacePressed = false;
-			break;
 		case 119: //w
 			if (upPressed) {
 				alSourceStop(source[0]);
@@ -751,18 +621,6 @@ void onKeyUp(unsigned char key, int x, int y) {
 			break;
 		case 115: //s
 			downPressed = false;
-			break;
-		case 97: //a
-			leftPressed = false;
-			break;
-		case 100: //d
-			rightPressed = false;
-			break;
-		case 99: //c
-			crouched = false;
-			break;
-		case 114: //r
-			running = false;
 			break;
 		case 27:
 			exit(0);
@@ -808,13 +666,6 @@ int main(int argc, char **argv) {
 	glutDisplayFunc(mainRender);
 
 	glutReshapeFunc(onWindowReshape);
-
-	/**
-	Register mouse events handlers
-	*/
-	glutMouseFunc(onMouseButton);
-	glutMotionFunc(onMouseMove);
-	glutPassiveMotionFunc(onMousePassiveMove);
 
 	/**
 	Register keyboard events handlers
