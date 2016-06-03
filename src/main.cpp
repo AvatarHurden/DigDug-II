@@ -1,21 +1,6 @@
 /**
-Laboratorio FCG - Pratica 4
-Ultima modificacao: 09/05/2016 - Acompanha bibliotecas: bitmap.c(.h), glm.cpp,
-glmimg.cpp, Texture.cpp(Texture.h)
-
-Implementa a movimentação simples de uma camera em primeira pessoa para um personagem que anda
-sobre um plano. Utiliza a biblioteca bitmap para carregamento simples de texturas, glm
-para modelos OBJ e glmimg + Texture para aplicacao de texturas TGA sobre os modelos carregados
-
-Tarefas:
-
-1 - Adicionar neblina à cena ao implementar a função enableFog() com os parâmetros de habilitação de fog em OpenGL;
-2 - Usar uma imagem no formato BMP como mapa pra posicionar objetos 3D na cena. Use a cor de cada pixel para definir
-qual modelo será colocado e a posição do pixel para definir a posição do modelo no espaço. Pixels pretos não representam
-nenhum modelo, fazendo com que a posição fique vazia na cena;
-3 - Mudar as configurações da fonte de luz da cena, já implementada no código base dado, para que
-seja uma spotlight;
-4 - Adicionar uma segunda fonte de luz que fique girando ao redor do cenário.
+Trabalho Final FCG
+Arthur Vedana e Vitor Vanacor
 */
 
 #include <windows.h>
@@ -50,7 +35,6 @@ seja uma spotlight;
 #define SMOOTH_MATERIAL_TEXTURE 2
 
 void mainInit();
-void initSound();
 void initTexture();
 void initModel();
 void initLight();
@@ -449,7 +433,6 @@ void renderFloor() {
     }
 
 	glDisable(type);
-
 
 	glPopMatrix();
 }
