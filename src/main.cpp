@@ -19,6 +19,8 @@ Arthur Vedana e Vitor Vanacor
 
 //bitmap class to load bitmaps for textures
 #include "bitmap.h"
+#include "player.c"
+#include "camera.c"
 
 #pragma comment(lib, "OpenAL32.lib")
 #pragma comment(lib, "alut.lib")
@@ -74,9 +76,6 @@ double yOffset = -1.3;
 int mouseLastX = 0;
 int mouseLastY = 0;
 
-bool upPressed = false;
-bool downPressed = false;
-
 float lightX = 0;
 float lightY = 0;
 float lightZ = 0;
@@ -105,119 +104,8 @@ struct object
     int z;
 } objects[500];
 
-/*************** PLAYER ********************************************************/
-typedef struct PLAYER{
-    GLMmodel *model;
-    float x;
-    float y;
-    float z;
-    float speedX;
-    float speedY;
-    float speedZ;
-    int roty;
-    float rotx;
-    bool turningLeft;
-    bool turningRight;
-    float headPosAux;
-} Player;
-
-Player newPlayer(){
-    printf("New Player.\n");
-    Player p;
-    p.x = 0.0f;
-    p.y = 0.0f;
-    p.z = 2.0f;
-    p.speedX = 0.0f;
-    p.speedY = 0.0f;
-    p.speedZ = 0.0f;
-    p.roty = 0;
-    p.rotx = 90.0f;
-    p.turningLeft = false;
-    p.turningRight = false;
-    p.headPosAux = 0.0f;
-    return p;
-}
-
-void PlayerUpdate(Player* p) {
-    //printf("Player Update\n");
-    if ((*p).turningRight || (*p).turningLeft) {
-        if ((*p).turningRight) {
-            (*p).roty += 10;
-            if ((*p).roty % 90 == 0)
-                (*p).turningRight = false;
-        } else if ((*p).turningLeft) {
-            (*p).roty -= 10;
-            if ((*p).roty % 90 == 0)
-                (*p).turningLeft = false;
-        }
-
-        if ((*p).roty >= 360)
-            (*p).roty -= 360;
-        else if ((*p).roty <= 0)
-            (*p).roty += 360;
-
-    } else if (upPressed || downPressed) {
-
-        (*p).speedX = 0.05 * sin((*p).roty*PI/180);
-		(*p).speedZ = -0.05 * cos((*p).roty*PI/180);
-
-		// efeito de "sobe e desce" ao andar
-		(*p).headPosAux += 8.5f;
-		if ((*p).headPosAux > 180.0f) {
-			(*p).headPosAux = 0.0f;
-		}
-
-        if (upPressed) {
-            (*p).x += (*p).speedX;
-            (*p).z += (*p).speedZ;
-        } else {
-            (*p).x -= (*p).speedX;
-            (*p).z -= (*p).speedZ;
-        }
-
-	} else {
-		// parou de andar, para com o efeito de "sobe e desce"
-		(*p).headPosAux = fmod((*p).headPosAux, 90) - 1 * (*p).headPosAux / 90;
-		(*p).headPosAux -= 4.0f;
-		if ((*p).headPosAux < 0.0f) {
-			(*p).headPosAux = 0.0f;
-		}
-	}
-}
 Player player = newPlayer();
-/***************** PLAYER END ***********************************************/
-
-/***************** CAMERA ***********************************************/
-typedef struct CAMERA{
-    Player* player;
-} Camera;
-
-Camera newCamera(Player* p){
-    printf("New Camera.\n");
-    Camera c;
-    c.player = p;
-    glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	gluPerspective(45.0f,(GLfloat)windowWidth/(GLfloat)windowHeight,0.1f, 100.0f);
-
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	return c;
-}
-void CameraUpdate(Camera c) {
-    //printf("update Camera\n");
-    float posYOffset = 0.2;
-    Player p = *(c.player);
-    float eyeX = p.x;
-    float eyeY = p.y + posYOffset + 0.025 * std::abs(sin(p.headPosAux*PI/180));
-    float eyeZ = p.z;
-    float centerX = eyeX + sin(p.roty*PI/180);
-    float centerY = eyeY + cos(p.rotx*PI/180);
-    float centerZ = eyeZ - cos(p.roty*PI/180);
-	gluLookAt(eyeX,eyeY,eyeZ,centerX,centerY,centerZ,0.0,1.0,0.0);
-}
-Camera camera = newCamera(&player);
-/***************** CAMERA END ***********************************************/
+Camera camera = newCamera(&player, windowWidth, windowHeight);
 
 // Aux function to load the object using GLM and apply some functions
 bool C3DObject_Load_New(const char *pszFilename, GLMmodel **model)
@@ -499,10 +387,10 @@ void onKeyDown(unsigned char key, int x, int y) {
 	//printf("%d \n", key);
 	switch (key) {
 		case 119: //w
-			upPressed = true;
+			player.goingForward = true;
 			break;
 		case 115: //s
-			downPressed = true;
+			player.goingBackward = true;
 			break;
 		case 97: //a
             if (!player.turningRight)
@@ -525,10 +413,10 @@ Key release event handler
 void onKeyUp(unsigned char key, int x, int y) {
 	switch (key) {
 		case 119: //w
-			upPressed = false;
+			player.goingForward = false;
 			break;
 		case 115: //s
-			downPressed = false;
+			player.goingBackward = false;
 			break;
 		case 27:
 			exit(0);
@@ -543,7 +431,7 @@ void onKeyUp(unsigned char key, int x, int y) {
 void onWindowReshape(int x, int y) {
 	windowWidth = x;
 	windowHeight = y;
-	camera = newCamera(&player);
+	camera = newCamera(&player, windowWidth, windowHeight);
 	setViewport(0, windowWidth, 0, windowHeight);
 }
 
