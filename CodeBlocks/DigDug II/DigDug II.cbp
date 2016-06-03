@@ -60,10 +60,24 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../src/bitmap.h" />
+		<Unit filename="../../src/camera.c">
+			<Option compilerVar="CC" />
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="../../src/camera.h">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
 		<Unit filename="../../src/glm.cpp" />
 		<Unit filename="../../src/glm.h" />
 		<Unit filename="../../src/glmimg.cpp" />
 		<Unit filename="../../src/main.cpp" />
+		<Unit filename="../../src/player.c">
+			<Option compilerVar="CC" />
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="../../src/player.h">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
 		<Extensions>
 			<code_completion />
 			<debugger />
