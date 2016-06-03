@@ -69,6 +69,8 @@ void updateState();
 void renderFloor();
 void updateCam();
 
+
+
 /**
 Screen dimensions
 */
@@ -88,51 +90,14 @@ double yOffset = -1.3;
 int mouseLastX = 0;
 int mouseLastY = 0;
 
-int roty = 0;
-float rotx = 90.0f;
-
 bool upPressed = false;
 bool downPressed = false;
-
-bool turningLeft = false;
-bool turningRight = false;
-
-float speedX = 0.0f;
-float speedY = 0.0f;
-float speedZ = 0.0f;
-
-float posX = 0.0f;
-float posY = 0.0f;
-float posZ = 2.0f;
 
 float lightX = 0;
 float lightY = 0;
 float lightZ = 0;
 
-/*
-variavel auxiliar pra dar variação na altura do ponto de vista ao andar.
-*/
-float headPosAux = 0.0f;
-
 float planeSize = 8.0f;
-
-// more sound stuff (position, speed and orientation of the listener)
-ALfloat listenerPos[]={0.0,0.0,4.0};
-ALfloat listenerVel[]={0.0,0.0,0.0};
-ALfloat listenerOri[]={0.0,0.0,1.0,
-						0.0,1.0,0.0};
-
-// now the position and speed of the sound source
-ALfloat source0Pos[]={ -2.0, 0.0, 0.0};
-ALfloat source0Vel[]={ 0.0, 0.0, 0.0};
-
-// buffers for openal stuff
-ALuint  buffer[NUM_BUFFERS];
-ALuint  source[NUM_SOURCES];
-ALuint  environment[NUM_ENVIRONMENTS];
-ALsizei size,freq;
-ALenum  format;
-ALvoid  *data;
 
 // parte de código extraído de "texture.c" por Michael Sweet (OpenGL SuperBible)
 // texture buffers and stuff
@@ -146,8 +111,6 @@ GLubyte     temp;            /* Swapping variable */
 GLenum      type;            /* Texture type */
 GLuint      texture;         /* Texture object */
 
-float posYOffset = 0.2;
-
 float backgrundColor[4] = {0.0f,0.0f,0.0f,1.0f};
 
 int totalObjects = 0;
@@ -158,6 +121,120 @@ struct object
     int z;
 } objects[500];
 
+/*************** PLAYER ********************************************************/
+typedef struct PLAYER{
+    GLMmodel *model;
+    float x;
+    float y;
+    float z;
+    float speedX;
+    float speedY;
+    float speedZ;
+    int roty;
+    float rotx;
+    bool turningLeft;
+    bool turningRight;
+    float headPosAux;
+} Player;
+
+Player newPlayer(){
+    printf("New Player.\n");
+    Player p;
+    p.x = 0.0f;
+    p.y = 0.0f;
+    p.z = 2.0f;
+    p.speedX = 0.0f;
+    p.speedY = 0.0f;
+    p.speedZ = 0.0f;
+    p.roty = 0;
+    p.rotx = 90.0f;
+    p.turningLeft = false;
+    p.turningRight = false;
+    p.headPosAux = 0.0f;
+    return p;
+}
+
+void PlayerUpdate(Player* p) {
+    //printf("Player Update\n");
+    if ((*p).turningRight || (*p).turningLeft) {
+        if ((*p).turningRight) {
+            (*p).roty += 3;
+            if ((*p).roty % 90 == 0)
+                (*p).turningRight = false;
+        } else if ((*p).turningLeft) {
+            (*p).roty -= 3;
+            if ((*p).roty % 90 == 0)
+                (*p).turningLeft = false;
+        }
+
+        if ((*p).roty >= 360)
+            (*p).roty -= 360;
+        else if ((*p).roty <= 0)
+            (*p).roty += 360;
+
+    } else if (upPressed || downPressed) {
+
+        (*p).speedX = 0.05 * sin((*p).roty*PI/180);
+		(*p).speedZ = -0.05 * cos((*p).roty*PI/180);
+
+		// efeito de "sobe e desce" ao andar
+		(*p).headPosAux += 8.5f;
+		if ((*p).headPosAux > 180.0f) {
+			(*p).headPosAux = 0.0f;
+		}
+
+        if (upPressed) {
+            (*p).x += (*p).speedX;
+            (*p).z += (*p).speedZ;
+        } else {
+            (*p).x -= (*p).speedX;
+            (*p).z -= (*p).speedZ;
+        }
+
+	} else {
+		// parou de andar, para com o efeito de "sobe e desce"
+		(*p).headPosAux = fmod((*p).headPosAux, 90) - 1 * (*p).headPosAux / 90;
+		(*p).headPosAux -= 4.0f;
+		if ((*p).headPosAux < 0.0f) {
+			(*p).headPosAux = 0.0f;
+		}
+	}
+}
+Player player = newPlayer();
+/***************** PLAYER END ***********************************************/
+
+/***************** CAMERA ***********************************************/
+typedef struct CAMERA{
+    Player* player;
+} Camera;
+
+Camera newCamera(Player* p){
+    printf("New Camera.\n");
+    Camera c;
+    c.player = p;
+    glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluPerspective(45.0f,(GLfloat)windowWidth/(GLfloat)windowHeight,0.1f, 100.0f);
+
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	return c;
+}
+void CameraUpdate(Camera c) {
+    //printf("update Camera\n");
+    float posYOffset = 0.2;
+    Player p = *(c.player);
+    float eyeX = p.x;
+    float eyeY = p.y + posYOffset + 0.025 * std::abs(sin(p.headPosAux*PI/180));
+    float eyeZ = p.z;
+    float centerX = eyeX + sin(p.roty*PI/180);
+    float centerY = eyeY + cos(p.rotx*PI/180);
+    float centerZ = eyeZ - cos(p.roty*PI/180);
+	gluLookAt(eyeX,eyeY,eyeZ,centerX,centerY,centerZ,0.0,1.0,0.0);
+}
+Camera camera = newCamera(&player);
+/***************** CAMERA END ***********************************************/
+
 // Aux function to load the object using GLM and apply some functions
 bool C3DObject_Load_New(const char *pszFilename, GLMmodel **model)
 {
@@ -165,9 +242,8 @@ bool C3DObject_Load_New(const char *pszFilename, GLMmodel **model)
     strcpy(aszFilename, pszFilename);
 
     if (*model) {
-
-    free(*model);
-    *model = NULL;
+        free(*model);
+        *model = NULL;
     }
 
     *model = glmReadOBJ(aszFilename);
@@ -180,37 +256,6 @@ bool C3DObject_Load_New(const char *pszFilename, GLMmodel **model)
     glmVertexNormals(*model, 90.0);
 
     return true;
-}
-
-void setWindow() {
-
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	gluPerspective(45.0f,(GLfloat)windowWidth/(GLfloat)windowHeight,0.1f, 100.0f);
-
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	gluLookAt(posX,posY + posYOffset + 0.025 * std::abs(sin(headPosAux*PI/180)),posZ,
-		posX + sin(roty*PI/180),posY + posYOffset + 0.025 * std::abs(sin(headPosAux*PI/180)) + cos(rotx*PI/180),posZ -cos(roty*PI/180),
-		0.0,1.0,0.0);
-}
-
-/**
-Atualiza a posição e orientação da camera
-*/
-void updateCam() {
-
-	gluLookAt(posX,posY + posYOffset + 0.025 * std::abs(sin(headPosAux*PI/180)),posZ,
-		posX + sin(roty*PI/180),posY + posYOffset + 0.025 * std::abs(sin(headPosAux*PI/180)) + cos(rotx*PI/180),posZ -cos(roty*PI/180),
-		0.0,1.0,0.0);
-
-	// atualiza a posição do listener e da origen do som, são as mesmas da camera, já que os passos vem de onde o personagem está
-	listenerPos[0] = posX;
-	listenerPos[1] = posY;
-	listenerPos[2] = posZ;
-	source0Pos[0] = posX;
-	source0Pos[1] = posY;
-	source0Pos[2] = posZ;
 }
 
 void initLight() {
@@ -240,13 +285,10 @@ Initialize
 void mainInit() {
 	glClearColor(1.0,1.0,1.0,0.0);
 	glColor3f(0.0f,0.0f,0.0f);
-	setWindow();
 	setViewport(0, windowWidth, 0, windowHeight);
 
 	// habilita o z-buffer
 	glEnable(GL_DEPTH_TEST);
-
-    initSound();
 
     initTexture();
 
@@ -317,69 +359,6 @@ void initModel() {
 
     }
 	printf("Total objects:  %d. \n \n \n", totalObjects);
-}
-
-/**
-Initialize openal and check for errors
-*/
-void initSound() {
-
-	printf("Initializing OpenAl \n");
-
-	// Init openAL
-	alutInit(0, NULL);
-
-	alGetError(); // clear any error messages
-
-    // Generate buffers, or else no sound will happen!
-    alGenBuffers(NUM_BUFFERS, buffer);
-
-    if(alGetError() != AL_NO_ERROR)
-    {
-        printf("- Error creating buffers !!\n");
-        exit(1);
-    }
-    else
-    {
-        printf("init() - No errors yet.\n");
-    }
-
-	alutLoadWAVFile("Footsteps.wav",&format,&data,&size,&freq,false);
-    alBufferData(buffer[0],format,data,size,freq);
-
-	alGetError(); /* clear error */
-    alGenSources(NUM_SOURCES, source);
-
-    if(alGetError() != AL_NO_ERROR)
-    {
-        printf("- Error creating sources !!\n");
-        exit(2);
-    }
-    else
-    {
-        printf("init - no errors after alGenSources\n");
-    }
-
-	listenerPos[0] = posX;
-	listenerPos[1] = posY;
-	listenerPos[2] = posZ;
-
-	source0Pos[0] = posX;
-	source0Pos[1] = posY;
-	source0Pos[2] = posZ;
-
-	alListenerfv(AL_POSITION,listenerPos);
-    alListenerfv(AL_VELOCITY,listenerVel);
-    alListenerfv(AL_ORIENTATION,listenerOri);
-
-	alSourcef(source[0], AL_PITCH, 1.0f);
-    alSourcef(source[0], AL_GAIN, 1.0f);
-    alSourcefv(source[0], AL_POSITION, source0Pos);
-    alSourcefv(source[0], AL_VELOCITY, source0Vel);
-    alSourcei(source[0], AL_BUFFER,buffer[0]);
-    alSourcei(source[0], AL_LOOPING, AL_TRUE);
-
-	printf("Sound ok! \n\n");
 }
 
 /**
@@ -482,7 +461,7 @@ void renderScene() {
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
-	updateCam();
+	CameraUpdate(camera);
 
     for (i=0; i<totalObjects; i++){
         glPushMatrix();
@@ -497,59 +476,11 @@ void renderScene() {
 	renderFloor();
 }
 
-void updateState() {
-
-    if (turningRight || turningLeft) {
-        if (turningRight) {
-            roty += 2;
-            if (roty % 90 == 0)
-                turningRight = false;
-        } else if (turningLeft) {
-            roty -= 2;
-            if (roty % 90 == 0)
-                turningLeft = false;
-        }
-
-        if (roty >= 360)
-            roty -= 360;
-        else if (roty <= 0)
-            roty += 360;
-
-    } else if (upPressed || downPressed) {
-
-        speedX = 0.05 * sin(roty*PI/180);
-		speedZ = -0.05 * cos(roty*PI/180);
-
-		// efeito de "sobe e desce" ao andar
-		headPosAux += 8.5f;
-		if (headPosAux > 180.0f) {
-			headPosAux = 0.0f;
-		}
-
-        if (upPressed) {
-            posX += speedX;
-            posZ += speedZ;
-        } else {
-            posX -= speedX;
-            posZ -= speedZ;
-        }
-
-	} else {
-		// parou de andar, para com o efeito de "sobe e desce"
-		headPosAux = fmod(headPosAux, 90) - 1 * headPosAux / 90;
-		headPosAux -= 4.0f;
-		if (headPosAux < 0.0f) {
-			headPosAux = 0.0f;
-		}
-	}
-
-}
-
 /**
 Render scene
 */
 void mainRender() {
-	updateState();
+	PlayerUpdate(&player);
 	renderScene();
 	glFlush();
 	glutPostRedisplay();
@@ -585,21 +516,18 @@ void onKeyDown(unsigned char key, int x, int y) {
 	//printf("%d \n", key);
 	switch (key) {
 		case 119: //w
-			if (!upPressed) {
-				alSourcePlay(source[0]);
-			}
 			upPressed = true;
 			break;
 		case 115: //s
 			downPressed = true;
 			break;
 		case 97: //a
-            if (!turningRight)
-                turningLeft = true;
+            if (!player.turningRight)
+                player.turningLeft = true;
 			break;
 		case 100: //d
-		    if (!turningLeft)
-                turningRight = true;
+		    if (!player.turningLeft)
+                player.turningRight = true;
 			break;
 		default:
 			break;
@@ -614,9 +542,6 @@ Key release event handler
 void onKeyUp(unsigned char key, int x, int y) {
 	switch (key) {
 		case 119: //w
-			if (upPressed) {
-				alSourceStop(source[0]);
-			}
 			upPressed = false;
 			break;
 		case 115: //s
@@ -635,7 +560,7 @@ void onKeyUp(unsigned char key, int x, int y) {
 void onWindowReshape(int x, int y) {
 	windowWidth = x;
 	windowHeight = y;
-	setWindow();
+	camera = newCamera(&player);
 	setViewport(0, windowWidth, 0, windowHeight);
 }
 
