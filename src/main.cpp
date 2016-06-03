@@ -3,19 +3,19 @@ Laboratorio FCG - Pratica 4
 Ultima modificacao: 09/05/2016 - Acompanha bibliotecas: bitmap.c(.h), glm.cpp,
 glmimg.cpp, Texture.cpp(Texture.h)
 
-Implementa a movimentaÁ„o simples de uma camera em primeira pessoa para um personagem que anda
+Implementa a movimenta√ß√£o simples de uma camera em primeira pessoa para um personagem que anda
 sobre um plano. Utiliza a biblioteca bitmap para carregamento simples de texturas, glm
 para modelos OBJ e glmimg + Texture para aplicacao de texturas TGA sobre os modelos carregados
 
 Tarefas:
 
-1 - Adicionar neblina ‡ cena ao implementar a funÁ„o enableFog() com os par‚metros de habilitaÁ„o de fog em OpenGL;
+1 - Adicionar neblina √† cena ao implementar a fun√ß√£o enableFog() com os par√¢metros de habilita√ß√£o de fog em OpenGL;
 2 - Usar uma imagem no formato BMP como mapa pra posicionar objetos 3D na cena. Use a cor de cada pixel para definir
-qual modelo ser· colocado e a posiÁ„o do pixel para definir a posiÁ„o do modelo no espaÁo. Pixels pretos n„o representam
-nenhum modelo, fazendo com que a posiÁ„o fique vazia na cena;
-3 - Mudar as configuraÁıes da fonte de luz da cena, j· implementada no cÛdigo base dado, para que
+qual modelo ser√° colocado e a posi√ß√£o do pixel para definir a posi√ß√£o do modelo no espa√ßo. Pixels pretos n√£o representam
+nenhum modelo, fazendo com que a posi√ß√£o fique vazia na cena;
+3 - Mudar as configura√ß√µes da fonte de luz da cena, j√° implementada no c√≥digo base dado, para que
 seja uma spotlight;
-4 - Adicionar uma segunda fonte de luz que fique girando ao redor do cen·rio.
+4 - Adicionar uma segunda fonte de luz que fique girando ao redor do cen√°rio.
 */
 
 #include <windows.h>
@@ -99,7 +99,7 @@ float lightZ = 0;
 
 float planeSize = 8.0f;
 
-// parte de cÛdigo extraÌdo de "texture.c" por Michael Sweet (OpenGL SuperBible)
+// parte de c√≥digo extra√≠do de "texture.c" por Michael Sweet (OpenGL SuperBible)
 // texture buffers and stuff
 int i;                       /* Looping var */
 BITMAPINFO	*info;           /* Bitmap information */
@@ -158,11 +158,11 @@ void PlayerUpdate(Player* p) {
     //printf("Player Update\n");
     if ((*p).turningRight || (*p).turningLeft) {
         if ((*p).turningRight) {
-            (*p).roty += 3;
+            (*p).roty += 10;
             if ((*p).roty % 90 == 0)
                 (*p).turningRight = false;
         } else if ((*p).turningLeft) {
-            (*p).roty -= 3;
+            (*p).roty -= 10;
             if ((*p).roty % 90 == 0)
                 (*p).turningLeft = false;
         }
