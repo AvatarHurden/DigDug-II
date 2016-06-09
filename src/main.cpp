@@ -102,6 +102,7 @@ struct object
     GLMmodel *model;
     int x;
     int z;
+    double y;
 } objects[500];
 
 Player player = newPlayer();
@@ -123,7 +124,7 @@ bool C3DObject_Load_New(const char *pszFilename, GLMmodel **model)
     return false;
 
     glmUnitize(*model);
-    //glmScale(model,sFactor); // USED TO SCALE THE OBJECT
+    glmScale(*model,0.12); // USED TO SCALE THE OBJECT
     glmFacetNormals(*model);
     glmVertexNormals(*model, 90.0);
 
@@ -180,13 +181,33 @@ void mainInit() {
 void initModel() {
 	printf("Loading models.. \n");
     bits = LoadDIBitmap("map.bmp", &info);
+
+    int _x = 0;
+    int _z = (int)info->bmiHeader.biHeight - 1;
     if (bits == (GLubyte *)0) {
+        bool modelLoaded = C3DObject_Load_New("../../res/goblin_obj.obj", &player.model);
+
+//        if(modelLoaded){
+//            objects[totalObjects].x = 4;
+//            objects[totalObjects].z = 4;
+//            objects[totalObjects].y = 0.1172;
+//            totalObjects += 1;
+//            modelLoaded = false;
+//        }
+
+        modelLoaded = C3DObject_Load_New("../../res/ladybird.obj", &objects[totalObjects].model);
+
+        if(modelLoaded){
+            objects[totalObjects].x = 3;
+            objects[totalObjects].z = 3;
+            objects[totalObjects].y = 0.1172;
+            totalObjects += 1;
+            modelLoaded = false;
+        }
 		printf ("Error loading texture!\n\n");
 		return;
 	}
 
-    int _x = 0;
-    int _z = (int)info->bmiHeader.biHeight - 1;
     bool modelLoaded = false;
     i = info->bmiHeader.biWidth * info->bmiHeader.biHeight;
     for(ptr = bits; i > 0; i--, ptr += 3)
@@ -334,9 +355,23 @@ void renderScene() {
 
 	CameraUpdate(camera);
 
+    glPushMatrix();
+        float eyeX = player.x;
+        float eyeY = player.y + 0.2 + 0.025 * std::abs(sin(player.headPosAux*PI/180));
+        float eyeZ = player.z;
+
+        float centerX = eyeX + 0.3*sin(player.roty*PI/180);
+        float centerY = eyeY + cos(player.rotx*PI/180) - 0.147;
+        float centerZ = eyeZ - 0.3*cos(player.roty*PI/180);
+
+        glTranslatef(GLfloat(centerX), GLfloat(centerY), GLfloat(centerZ));
+        glRotatef(180 - player.roty, 0, 1, 0);
+        glmDraw(player.model, GLM_SMOOTH);
+    glPopMatrix();
+
     for (i=0; i<totalObjects; i++){
         glPushMatrix();
-            glTranslatef(GLfloat(objects[i].x - 3), 0.5, GLfloat(objects[i].z - 3));
+            glTranslatef(GLfloat(objects[i].x - 3), GLfloat(objects[i].y), GLfloat(objects[i].z - 3));
             glmDraw(objects[i].model, GLM_SMOOTH);
         glPopMatrix();
     }
