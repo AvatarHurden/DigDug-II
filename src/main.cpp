@@ -185,7 +185,7 @@ void initModel() {
     int _x = 0;
     int _z = (int)info->bmiHeader.biHeight - 1;
     if (bits == (GLubyte *)0) {
-        bool modelLoaded = C3DObject_Load_New("../../res/goblin_obj.obj", &player.model);
+//        bool modelLoaded = C3DObject_Load_New("../../res/goblin_obj.obj", &player.model);
 
 //        if(modelLoaded){
 //            objects[totalObjects].x = 4;
@@ -195,15 +195,15 @@ void initModel() {
 //            modelLoaded = false;
 //        }
 
-        modelLoaded = C3DObject_Load_New("../../res/ladybird.obj", &objects[totalObjects].model);
-
-        if(modelLoaded){
-            objects[totalObjects].x = 3;
-            objects[totalObjects].z = 3;
-            objects[totalObjects].y = 0.1172;
-            totalObjects += 1;
-            modelLoaded = false;
-        }
+//        modelLoaded = C3DObject_Load_New("../../res/ladybird.obj", &objects[totalObjects].model);
+//
+//        if(modelLoaded){
+//            objects[totalObjects].x = 3;
+//            objects[totalObjects].z = 3;
+//            objects[totalObjects].y = 0.1172;
+//            totalObjects += 1;
+//            modelLoaded = false;
+//        }
 		printf ("Error loading texture!\n\n");
 		return;
 	}
@@ -354,20 +354,7 @@ void renderScene() {
 	glLoadIdentity();
 
 	CameraUpdate(camera);
-
-    glPushMatrix();
-        float eyeX = player.x;
-        float eyeY = player.y + 0.2 + 0.025 * std::abs(sin(player.headPosAux*PI/180));
-        float eyeZ = player.z;
-
-        float centerX = eyeX + 0.3*sin(player.roty*PI/180);
-        float centerY = eyeY + cos(player.rotx*PI/180) - 0.147;
-        float centerZ = eyeZ - 0.3*cos(player.roty*PI/180);
-
-        glTranslatef(GLfloat(centerX), GLfloat(centerY), GLfloat(centerZ));
-        glRotatef(180 - player.roty, 0, 1, 0);
-        glmDraw(player.model, GLM_SMOOTH);
-    glPopMatrix();
+    PlayerDraw(player);
 
     for (i=0; i<totalObjects; i++){
         glPushMatrix();
@@ -453,6 +440,11 @@ void onKeyUp(unsigned char key, int x, int y) {
 		case 115: //s
 			player.goingBackward = false;
 			break;
+        case 118:
+            if (camera.type == FIRSTPERSON) camera.type = THIRDPERSON;
+            else if (camera.type == THIRDPERSON) camera.type = TOPDOWN;
+            else if (camera.type == TOPDOWN) camera.type = FIRSTPERSON;
+            break;
 		case 27:
 			exit(0);
 			break;

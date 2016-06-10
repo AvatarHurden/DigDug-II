@@ -2,21 +2,39 @@
 
 #define PI 3.14159265
 
+void loadModel(Player* p);
+
 Player newPlayer(){
     printf("New Player.\n");
     Player p;
     p.x = 0.0f;
     p.y = 0.0f;
     p.z = 2.0f;
+
     p.speedX = 0.0f;
     p.speedY = 0.0f;
     p.speedZ = 0.0f;
+
     p.roty = 0;
     p.rotx = 90.0f;
+
     p.turningLeft = false;
     p.turningRight = false;
     p.headPosAux = 0.0f;
+
+    loadModel(&p);
+
     return p;
+}
+
+void loadModel(Player* p) {
+
+    p->model = glmReadOBJ("../../res/goblin_obj.obj");
+
+    glmUnitize(p->model);
+    glmScale(p->model,0.12); // USED TO SCALE THE OBJECT
+    glmFacetNormals(p->model);
+    glmVertexNormals(p->model, 90.0);
 }
 
 void PlayerUpdate(Player* p) {
@@ -64,4 +82,15 @@ void PlayerUpdate(Player* p) {
 			p->headPosAux = 0.0f;
 		}
 	}
+}
+
+void PlayerDraw(Player player) {
+    glPushMatrix();
+
+        float eyeY = player.y + 0.119 + 0.025 * std::abs(sin(player.headPosAux*PI/180));
+
+        glTranslatef(GLfloat(player.x), GLfloat(eyeY), GLfloat(player.z));
+        glRotatef(180 - player.roty, 0, 1, 0);
+        glmDraw(player.model, GLM_SMOOTH);
+    glPopMatrix();
 }

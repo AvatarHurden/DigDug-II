@@ -15,7 +15,9 @@ typedef struct PLAYER{
     float headPosAux;
 } Player;
 
+
 Player newPlayer();
 void PlayerUpdate(Player* p);
+void PlayerDraw(Player* p);
 
 #endif // PLAYER_H_INCLUDED
