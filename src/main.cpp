@@ -21,6 +21,7 @@ Arthur Vedana e Vitor Vanacor
 #include "bitmap.h"
 #include "player.c"
 #include "camera.c"
+#include "enemy.c"
 
 #pragma comment(lib, "OpenAL32.lib")
 #pragma comment(lib, "alut.lib")
@@ -107,6 +108,7 @@ struct object
 
 Player player = newPlayer();
 Camera camera = newCamera(&player, windowWidth, windowHeight);
+Enemy enemy = newEnemy();
 
 // Aux function to load the object using GLM and apply some functions
 bool C3DObject_Load_New(const char *pszFilename, GLMmodel **model)
@@ -355,6 +357,7 @@ void renderScene() {
 
 	CameraUpdate(camera);
     PlayerDraw(player);
+    EnemyDraw(enemy);
 
     for (i=0; i<totalObjects; i++){
         glPushMatrix();
@@ -374,6 +377,7 @@ Render scene
 */
 void mainRender() {
 	PlayerUpdate(&player);
+    EnemyUpdate(&enemy, player);
 	renderScene();
 	glFlush();
 	glutPostRedisplay();

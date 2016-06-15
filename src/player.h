@@ -18,6 +18,6 @@ typedef struct PLAYER{
 
 Player newPlayer();
 void PlayerUpdate(Player* p);
-void PlayerDraw(Player* p);
+void PlayerDraw(Player p);
 
 #endif // PLAYER_H_INCLUDED

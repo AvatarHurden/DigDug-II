@@ -891,7 +891,7 @@
 	<GL/glut.h>
 	<math.h>
 
-1464203998 source:c:\users\arthur\dropbox\documentos\github\digdug ii\src\main.cpp
+1466024407 source:c:\users\arthur\dropbox\documentos\github\digdug ii\src\main.cpp
 	<windows.h>
 	<stdio.h>
 	<stdlib.h>
@@ -902,6 +902,9 @@
 	"glm.h"
 	<al/alut.h>
 	"bitmap.h"
+	"player.c"
+	"camera.c"
+	"enemy.c"
 
 1463443130 c:\users\arthur\dropbox\documentos\github\digdug ii\codeblocks\include\al\alut.h
 	<al/alc.h>
@@ -917,4 +920,20 @@
 
 1463443131 source:c:\users\arthur\dropbox\documentos\github\digdug ii\src\texture.cpp
 	"Texture.h"
+
+1466024350 c:\users\arthur\dropbox\documentos\github\digdug ii\src\player.h
+
+1465516969 c:\users\arthur\dropbox\documentos\github\digdug ii\src\player.c
+	"player.h"
+
+1465518209 c:\users\arthur\dropbox\documentos\github\digdug ii\src\camera.c
+	"camera.h"
+
+1465518002 c:\users\arthur\dropbox\documentos\github\digdug ii\src\camera.h
+
+1466024676 c:\users\arthur\dropbox\documentos\github\digdug ii\src\enemy.c
+	"enemy.h"
+	<time.h>
+
+1466024340 c:\users\arthur\dropbox\documentos\github\digdug ii\src\enemy.h
 
