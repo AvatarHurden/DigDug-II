@@ -22,6 +22,7 @@ Arthur Vedana e Vitor Vanacor
 #include "player.c"
 #include "camera.c"
 #include "enemy.c"
+#include "map.c"
 
 #pragma comment(lib, "OpenAL32.lib")
 #pragma comment(lib, "alut.lib")
@@ -95,7 +96,7 @@ GLubyte     temp;            /* Swapping variable */
 GLenum      type;            /* Texture type */
 GLuint      texture;         /* Texture object */
 
-float backgrundColor[4] = {0.0f,0.0f,0.0f,1.0f};
+float backgrundColor[4] = {0.529f,0.807f,0.980f,1.0f};
 
 int totalObjects = 0;
 struct object
@@ -109,6 +110,7 @@ struct object
 Player player = newPlayer();
 Camera camera = newCamera(&player, windowWidth, windowHeight);
 Enemy enemy = newEnemy();
+Map m = newMap("../../res/lower.bmp", "../../res/upper.bmp");
 
 // Aux function to load the object using GLM and apply some functions
 bool C3DObject_Load_New(const char *pszFilename, GLMmodel **model)
