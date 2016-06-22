@@ -17,7 +17,8 @@ typedef struct ENEMY {
 } Enemy;
 
 Enemy newEnemy();
-void EnemyUpdate(Enemy* e, Player p);
+void EnemyUpdate(Enemy* e);
 void EnemyDraw(Enemy e);
+void setEnemyPositions(Enemy** e);
 
 #endif // ENEMY_H_INCLUDED
