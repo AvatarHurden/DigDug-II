@@ -10,6 +10,7 @@ Arthur Vedana e Vitor Vanacor
 #include <math.h>
 #include <cmath>
 #include <iostream>
+#include <gl/gl.h>
 #include <gl/glut.h>
 
 #include "glm.h"
@@ -40,7 +41,6 @@ Arthur Vedana e Vitor Vanacor
 
 void mainInit();
 void initTexture();
-void initModel();
 void initLight();
 void createGLUI();
 void mainRender();
@@ -56,8 +56,6 @@ void setViewport(GLint left, GLint right, GLint bottom, GLint top);
 void updateState();
 void renderFloor();
 void updateCam();
-
-
 
 /**
 Screen dimensions
@@ -77,10 +75,6 @@ double xOffset = -1.9;
 double yOffset = -1.3;
 int mouseLastX = 0;
 int mouseLastY = 0;
-
-float lightX = 0;
-float lightY = 0;
-float lightZ = 0;
 
 float planeSize = 8.0f;
 
@@ -155,7 +149,6 @@ void setViewport(GLint left, GLint right, GLint bottom, GLint top) {
 	glViewport(left, bottom, right - left, top - bottom);
 }
 
-
 /**
 Initialize
 */
@@ -169,94 +162,10 @@ void mainInit() {
 
     initTexture();
 
-	initModel();
-
 	initLight();
-
-	printf("w - andar \n");
-	printf("s - ir pra tras \n");
-	printf("mouse - direcao \n");
-	printf("r - correr \n");
-	printf("c - abaixar \n");
-	printf("espaco - pular \n");
-
 }
 
-void initModel() {
-	printf("Loading models.. \n");
-    bits = LoadDIBitmap("map.bmp", &info);
 
-    int _x = 0;
-    int _z = (int)info->bmiHeader.biHeight - 1;
-    if (bits == (GLubyte *)0) {
-//        bool modelLoaded = C3DObject_Load_New("../../res/goblin_obj.obj", &player.model);
-
-//        if(modelLoaded){
-//            objects[totalObjects].x = 4;
-//            objects[totalObjects].z = 4;
-//            objects[totalObjects].y = 0.1172;
-//            totalObjects += 1;
-//            modelLoaded = false;
-//        }
-
-//        modelLoaded = C3DObject_Load_New("../../res/ladybird.obj", &objects[totalObjects].model);
-//
-//        if(modelLoaded){
-//            objects[totalObjects].x = 3;
-//            objects[totalObjects].z = 3;
-//            objects[totalObjects].y = 0.1172;
-//            totalObjects += 1;
-//            modelLoaded = false;
-//        }
-		printf ("Error loading texture!\n\n");
-		return;
-	}
-
-    bool modelLoaded = false;
-    i = info->bmiHeader.biWidth * info->bmiHeader.biHeight;
-    for(ptr = bits; i > 0; i--, ptr += 3)
-    {
-        int color = (ptr[2] << 16) + (ptr[1] << 8) + ptr[0];
-        switch(color)
-        {
-        case 0x000000:
-            break;
-        case 0xff0000:
-            modelLoaded = C3DObject_Load_New("../../res/rose+vase.obj", &objects[totalObjects].model);
-            break;
-        case 0x00ff00:
-            modelLoaded = C3DObject_Load_New("../../res/f-16.obj", &objects[totalObjects].model);
-            break;
-        case 0x0000ff:
-            modelLoaded = C3DObject_Load_New("../../res/dolphins.obj", &objects[totalObjects].model);
-            break;
-        case 0xffff00:
-            modelLoaded = C3DObject_Load_New("../../res/flowers.obj", &objects[totalObjects].model);
-            break;
-        case 0xff00ff:
-            modelLoaded = C3DObject_Load_New("../../res/porsche.obj", &objects[totalObjects].model);
-            break;
-        case 0x00ffff:
-            modelLoaded = C3DObject_Load_New("../../res/soccerball.obj", &objects[totalObjects].model);
-        default:
-            printf("Unidentified color.");
-        }
-
-        _x += 1;
-        if (_x == (int)info->bmiHeader.biWidth){
-            _x = 0;
-            _z -= 1;
-        }
-        if(modelLoaded){
-            objects[totalObjects].x = _x;
-            objects[totalObjects].z = _z;
-            totalObjects += 1;
-            modelLoaded = false;
-        }
-
-    }
-	printf("Total objects:  %d. \n \n \n", totalObjects);
-}
 
 /**
 Initialize the texture using the library bitmap
@@ -361,16 +270,6 @@ void renderScene() {
     PlayerDraw(player);
     EnemyDraw(enemy);
 
-    for (i=0; i<totalObjects; i++){
-        glPushMatrix();
-            glTranslatef(GLfloat(objects[i].x - 3), GLfloat(objects[i].y), GLfloat(objects[i].z - 3));
-            glmDraw(objects[i].model, GLM_SMOOTH);
-        glPopMatrix();
-    }
-
-    // binds the bmp file already loaded to the OpenGL parameters
-    glBindTexture(type, texture);
-
 	renderFloor();
 }
 
@@ -446,10 +345,8 @@ void onKeyUp(unsigned char key, int x, int y) {
 		case 115: //s
 			player.goingBackward = false;
 			break;
-        case 118:
-            if (camera.type == FIRSTPERSON) camera.type = THIRDPERSON;
-            else if (camera.type == THIRDPERSON) camera.type = TOPDOWN;
-            else if (camera.type == TOPDOWN) camera.type = FIRSTPERSON;
+        case 118: //v
+            CameraChangeType(&camera);
             break;
 		case 27:
 			exit(0);

@@ -4,14 +4,10 @@ Camera newCamera(Player* p, int width, int height){
     printf("New Camera.\n");
     Camera c;
     c.player = p;
-    c.type = FIRSTPERSON;
-
-    glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	gluPerspective(45.0f,(GLfloat)width/(GLfloat)height,0.1f, 100.0f);
-
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
+    c.windowWidth = width;
+    c.windowHeight = height;
+    c.type = TOPDOWN; //Vai ser alterado para FIRSTPERSON pela ChangeType
+    CameraChangeType(&c);
 	return c;
 }
 void CameraUpdate(Camera c) {
@@ -45,15 +41,38 @@ void CameraUpdate(Camera c) {
         gluLookAt(eyeX,eyeY,eyeZ,centerX,centerY,centerZ,0.0,1.0,0.0);
 
     } else if (c.type == TOPDOWN) {
-        eyeX = 0;
+        eyeX = p.x;
         eyeY = 10;
-        eyeZ = 0;
+        eyeZ = p.z;
 
-        centerX = 0;
+        centerX = p.x;
         centerY = 0;
-        centerZ = 0;
+        centerZ = p.z;
 
         gluLookAt(eyeX,eyeY,eyeZ,centerX,centerY,centerZ,0.0,0.0,1.0);
     }
-
+}
+void CameraChangeType(Camera* c) {
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    switch (c->type){
+    case FIRSTPERSON:
+        c->type = THIRDPERSON;
+        gluPerspective(45.0f,(GLfloat)c->windowWidth/(GLfloat)c->windowHeight,0.1f, 100.0f);
+        break;
+    case THIRDPERSON:
+        c->type = TOPDOWN;
+        glOrtho(-5.0f, 5.0f, -5.0f, 5.0f, 0.0f , 11.0f);
+        break;
+    case TOPDOWN:
+        c->type = FIRSTPERSON;
+        gluPerspective(45.0f,c->windowWidth/c->windowHeight,0.1f, 100.0f);
+        break;
+    }
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+}
+void CameraResize(Camera* c, int w, int h){
+    c->windowWidth = w;
+    c->windowHeight = h;
 }
