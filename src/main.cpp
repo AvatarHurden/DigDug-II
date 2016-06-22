@@ -94,7 +94,7 @@ GLubyte	    *rgba;           /* RGBA pixel buffer */
 GLubyte	    *rgbaptr;        /* Pointer into RGBA buffer */
 GLubyte     temp;            /* Swapping variable */
 GLenum      type;            /* Texture type */
-GLuint      texture;         /* Texture object */
+//GLuint      texture;         /* Texture object */
 
 float backgrundColor[4] = {0.529f,0.807f,0.980f,1.0f};
 
@@ -169,7 +169,7 @@ void mainInit() {
 
     initTexture();
 
-	initModel();
+	//initModel();
 
 	initLight();
 
@@ -260,7 +260,7 @@ void initModel() {
 
 /**
 Initialize the texture using the library bitmap
-*/
+
 void initTexture(void)
 {
     printf ("\nLoading texture..\n");
@@ -320,26 +320,27 @@ void renderFloor() {
 	float textureScaleX = 10.0;
 	float textureScaleY = 10.0;
     glColor4f(1.0f,1.0f,1.0f,1.0f);
-    int xQuads = 40;
-    int zQuads = 40;
+    int xQuads = 100;
+    int zQuads = 100;
+    int divider = 40;
     for (int i = 0; i < xQuads; i++) {
         for (int j = 0; j < zQuads; j++) {
             glBegin(GL_QUADS);
                 glTexCoord2f(1.0f, 0.0f);   // coords for the texture
                 glNormal3f(0.0f,1.0f,0.0f);
-                glVertex3f(i * (float)planeSize/xQuads, 0.0f, (j+1) * (float)planeSize/zQuads);
+                glVertex3f(i * (float)planeSize/divider, 0.0f, (j+1) * (float)planeSize/divider);
 
                 glTexCoord2f(0.0f, 0.0f);  // coords for the texture
                 glNormal3f(0.0f,1.0f,0.0f);
-                glVertex3f((i+1) * (float)planeSize/xQuads, 0.0f, (j+1) * (float)planeSize/zQuads);
+                glVertex3f((i+1) * (float)planeSize/divider, 0.0f, (j+1) * (float)planeSize/divider);
 
                 glTexCoord2f(0.0f, 1.0f);  // coords for the texture
                 glNormal3f(0.0f,1.0f,0.0f);
-                glVertex3f((i+1) * (float)planeSize/xQuads, 0.0f, j * (float)planeSize/zQuads);
+                glVertex3f((i+1) * (float)planeSize/divider, 0.0f, j * (float)planeSize/divider);
 
                 glTexCoord2f(1.0f, 1.0f);  // coords for the texture
                 glNormal3f(0.0f,1.0f,0.0f);
-                glVertex3f(i * (float)planeSize/xQuads, 0.0f, j * (float)planeSize/zQuads);
+                glVertex3f(i * (float)planeSize/divider, 0.0f, j * (float)planeSize/divider);
 
             glEnd();
         }
@@ -349,6 +350,7 @@ void renderFloor() {
 
 	glPopMatrix();
 }
+*/
 
 void renderScene() {
 	glClearColor(backgrundColor[0],backgrundColor[1],backgrundColor[2],backgrundColor[3]);
@@ -371,7 +373,8 @@ void renderScene() {
     // binds the bmp file already loaded to the OpenGL parameters
     glBindTexture(type, texture);
 
-	renderFloor();
+	//renderFloor();
+	MapDraw(m);
 }
 
 /**
@@ -501,6 +504,10 @@ int main(int argc, char **argv) {
 	*/
 	glutKeyboardFunc(onKeyDown);
 	glutKeyboardUpFunc(onKeyUp);
+
+//	glEnable(GL_FOG);
+//	glFogfv(GL_FOG_COLOR, backgrundColor);
+//	glFogf(GL_FOG_DENSITY, 0.1);
 
 	mainInit();
 
