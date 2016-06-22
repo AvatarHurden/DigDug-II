@@ -37,7 +37,7 @@ void loadModel(Enemy* e) {
     glmVertexNormals(e->model, 90.0);
 }
 
-void EnemyUpdate(Enemy* e, Player p) {
+void EnemyUpdate(Enemy* e) {
     if (e->turningRight || e->turningLeft) {
         e->lastTurnTime = time(NULL);
 
@@ -83,4 +83,16 @@ void EnemyDraw(Enemy enemy) {
         glRotatef(enemy.roty, 0, 1, 0);
         glmDraw(enemy.model, GLM_SMOOTH);
     glPopMatrix();
+}
+
+void setEnemyPositions(Enemy* e) {
+    Map m = cloneMap();
+    int index = 0, i, j;
+    for (i = 0; i < m.width; i++)
+       for (j = 0; j < m.width; j++)
+           if (getTile(i, j) == ENEMY) {
+               (e+index)->x = i * m.tileSize + m.tileSize/2.0;
+               (e+index)->z = j * m.tileSize + m.tileSize/2.0;
+               index++;
+           }
 }
