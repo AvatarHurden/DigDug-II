@@ -3,21 +3,19 @@
 void drawBlock(Map m, int i, int j, int height);
 void drawWall(Map m, int i, int j, int height, int direction);
 
-GLuint texture;         /* Texture object */
-
-void initTexture(void) {
+void initTexture(char* name, GLuint* texture) {
     printf ("\nLoading texture..\n");
     // Load a texture object (256x256 true color)
     BITMAPINFO *info;
-    GLubyte* bits = LoadDIBitmap("../../res/tiledbronze.bmp", &info);
+    GLubyte* bits = LoadDIBitmap(name, &info);
     if (bits == (GLubyte *)0) {
 		printf ("Error loading texture!\n\n");
 		return;
 	}
 
     // Create and bind a texture object
-    glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
+    glGenTextures(1, texture);
+	glBindTexture(GL_TEXTURE_2D, *texture);
 
     GLubyte* rgba = (GLubyte *)malloc(info->bmiHeader.biWidth * info->bmiHeader.biHeight * 4);
 
@@ -39,8 +37,8 @@ void initTexture(void) {
     glTexImage2D(GL_TEXTURE_2D, 0, 4, info->bmiHeader.biWidth, info->bmiHeader.biHeight,
                   0, GL_RGBA, GL_UNSIGNED_BYTE, rgba);
 
-    printf("Textura %d\n", texture);
-	printf("Textures ok.\n\n", texture);
+    printf("Textura %d\n", *texture);
+	printf("Textures ok.\n\n");
 }
 
 void loadLowerFloor(Map* m, char* name) {
@@ -145,7 +143,9 @@ void loadUpperFloor(Map* m, char* name) {
 Map newMap(char* lower_file_name, char* upper_file_name) {
 
     Map m;
-    initTexture();
+    initTexture("../../res/chao_lateral.bmp", &m.chao_lateral);
+    initTexture("../../res/chao_topo.bmp", &m.chao_topo);
+    initTexture("../../res/tiledbronze.bmp", &m.rest);
     m.tileSize = 0.4;
     m.numEnemies = 0;
 
@@ -214,7 +214,6 @@ void MapDraw(Map m) {
 
     // Aqui ele define qual a textura a ser usada para o tipo TEXTURE_2D,
     // Isso será mudado para cada bloco, imagino
-    glBindTexture(GL_TEXTURE_2D, texture);
 
 	glShadeModel(GL_SMOOTH);
 	glEnable(GL_TEXTURE_2D);
@@ -235,6 +234,7 @@ void MapDraw(Map m) {
             switch (getTile(m, i, j)) {
                 case EMPTY: continue;
                 case BLOCK:
+                    glBindTexture(GL_TEXTURE_2D, m.rest);
                     drawBlock(m, i, j, 1);
                     drawWall(m, i, j, 1, 0);
                     drawWall(m, i, j, 1, 1);
@@ -242,6 +242,7 @@ void MapDraw(Map m) {
                     drawWall(m, i, j, 1, 3);
                     break;
                 default:
+                    glBindTexture(GL_TEXTURE_2D, m.chao_topo);
                     drawBlock(m, i, j, 0);
                 }
             if (getTile(m, i, j+1) == EMPTY)
@@ -284,6 +285,8 @@ void drawBlock(Map m, int i, int j, int level) {
 }
 
 void drawWall(Map m, int i, int j, int level, int direction) {
+
+    glBindTexture(GL_TEXTURE_2D, m.chao_lateral);
 
     float size = m.tileSize;
     float x1, x2, z1, z2;

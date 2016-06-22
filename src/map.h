@@ -8,6 +8,8 @@ typedef struct Map{
     float tileSize;
     int width;
     int numEnemies;
+
+    GLuint chao_lateral, chao_topo, rest;
 } Map;
 
 typedef struct POSITION {
