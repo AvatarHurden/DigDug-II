@@ -193,10 +193,18 @@ void setTile(int i, int j, TileType tile) {
     m.tiles[i + j * m.width] = tile;
 }
 
-TyleType getTileXZ(float x, float z){
+TileType getTileXZ(float x, float z){
     int L = (int)(x/m.tileSize);
     int C = (int)(z/m.tileSize);
     return m.tiles[L + C*m.width];
+}
+
+bool hasTypeAt(float x, float z, float radius, TileType type) {
+
+    return getTileXZ(x+radius, z+radius) == type ||
+        getTileXZ(x-radius, z+radius) == type ||
+        getTileXZ(x-radius, z-radius) == type ||
+        getTileXZ(x+radius, z-radius) == type;
 }
 
 void MapDraw() {

@@ -59,7 +59,7 @@ void PlayerUpdate() {
 
         if (player.roty >= 360)
             player.roty -= 360;
-        else if (player.roty <= 0)
+        else if (player.roty < 0)
             player.roty += 360;
 
     } else if (player.goingForward || player.goingBackward) {
@@ -80,7 +80,8 @@ void PlayerUpdate() {
             newX = player.x - player.speedX;
             newZ = player.z - player.speedZ;
         }
-        if (getTileXZ(newX, newZ) != BLOCK){
+
+        if (!hasTypeAt(newX, newZ, 0.075, BLOCK)){
             player.x = newX;
             player.z = newZ;
         }

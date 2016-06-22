@@ -21,6 +21,7 @@ void MapDraw();
 
 TileType getTile(int i, int j);
 TileType getTileXZ(float x, float z);
+bool hasTypeAt(float x, float z, float radius, TileType type);
 void setTile(int i, int j, TileType tile);
 
 

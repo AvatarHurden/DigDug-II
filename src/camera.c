@@ -20,9 +20,9 @@ void CameraUpdate() {
     float centerX, centerY, centerZ;
 
     if (camera.type == FIRSTPERSON) {
-        eyeX = p.x;
+        eyeX = p.x - 0.01*sin(p.roty*PI/180);
         eyeY = p.y + posYOffset + 0.025 * std::abs(sin(p.headPosAux*PI/180));
-        eyeZ = p.z;
+        eyeZ = p.z + 0.01*cos(p.roty*PI/180);
 
         centerX = eyeX + sin(p.roty*PI/180);
         centerY = eyeY + cos(p.rotx*PI/180);
