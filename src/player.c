@@ -2,91 +2,100 @@
 
 #define PI 3.14159265
 
-void loadModel(Player* p);
+void loadModel();
 
-Player newPlayer(){
+Player player;
+
+void newPlayer(){
     printf("New Player.\n");
-    Player p;
-    p.x = 0.0f;
-    p.y = 0.0f;
-    p.z = 2.0f;
 
-    p.speedX = 0.0f;
-    p.speedY = 0.0f;
-    p.speedZ = 0.0f;
+    player.x = 0.0f;
+    player.y = 0.0f;
+    player.z = 2.0f;
 
-    p.roty = 0;
-    p.rotx = 90.0f;
+    player.speedX = 0.0f;
+    player.speedY = 0.0f;
+    player.speedZ = 0.0f;
 
-    p.goingForward = false;
-    p.goingBackward = false;
-    p.turningLeft = false;
-    p.turningRight = false;
-    p.headPosAux = 0.0f;
+    player.roty = 0;
+    player.rotx = 90.0f;
 
-    loadModel(&p);
+    player.goingForward = false;
+    player.goingBackward = false;
+    player.turningLeft = false;
+    player.turningRight = false;
+    player.headPosAux = 0.0f;
 
-    return p;
+    setPlayerPosition();
+    loadModel();
+
 }
 
-void loadModel(Player* p) {
+Player clonePlayer(){ return player; }
+Player* getPlayer(){ return &player; }
 
-    p->model = glmReadOBJ("../../res/goblin_obj.obj");
+void loadModel() {
 
-    glmUnitize(p->model);
-    glmScale(p->model,0.12); // USED TO SCALE THE OBJECT
-    glmFacetNormals(p->model);
-    glmVertexNormals(p->model, 90.0);
+    player.model = glmReadOBJ("../../res/goblin_obj.obj");
+
+    glmUnitize(player.model);
+    glmScale(player.model,0.12); // USED TO SCALE THE OBJECT
+    glmFacetNormals(player.model);
+    glmVertexNormals(player.model, 90.0);
 }
 
-void PlayerUpdate(Player* p) {
+void PlayerUpdate() {
     //printf("Player Update\n");
-    if (p->turningRight || p->turningLeft) {
-        if (p->turningRight) {
-            p->roty += 10;
-            if (p->roty % 90 == 0)
-                p->turningRight = false;
-        } else if (p->turningLeft) {
-            p->roty -= 10;
-            if (p->roty % 90 == 0)
-                p->turningLeft = false;
+    if (player.turningRight || player.turningLeft) {
+        if (player.turningRight) {
+            player.roty += 10;
+            if (player.roty % 90 == 0)
+                player.turningRight = false;
+        } else if (player.turningLeft) {
+            player.roty -= 10;
+            if (player.roty % 90 == 0)
+                player.turningLeft = false;
         }
 
-        if (p->roty >= 360)
-            p->roty -= 360;
-        else if (p->roty <= 0)
-            p->roty += 360;
+        if (player.roty >= 360)
+            player.roty -= 360;
+        else if (player.roty <= 0)
+            player.roty += 360;
 
-    } else if (p->goingForward || p->goingBackward) {
+    } else if (player.goingForward || player.goingBackward) {
 
-        p->speedX = 0.05 * sin(p->roty*PI/180);
-		p->speedZ = -0.05 * cos(p->roty*PI/180);
+        player.speedX = 0.05 * sin(player.roty*PI/180);
+		player.speedZ = -0.05 * cos(player.roty*PI/180);
 
 		// efeito de "sobe e desce" ao andar
-		p->headPosAux += 8.5f;
-		if (p->headPosAux > 180.0f) {
-			p->headPosAux = 0.0f;
+		player.headPosAux += 8.5f;
+		if (player.headPosAux > 180.0f) {
+			player.headPosAux = 0.0f;
 		}
-
-        if (p->goingForward) {
-            p->x += p->speedX;
-            p->z += p->speedZ;
+        float newX, newZ;
+        if (player.goingForward) {
+            newX = player.x + player.speedX;
+            newZ = player.z + player.speedZ;
         } else {
-            p->x -= p->speedX;
-            p->z -= p->speedZ;
+            newX = player.x - player.speedX;
+            newZ = player.z - player.speedZ;
         }
+        //if (getTileType(map, newX, newZ) != BLOCK){
+            player.x = newX;
+            player.z = newZ;
+        //}
 
 	} else {
 		// parou de andar, para com o efeito de "sobe e desce"
-		p->headPosAux = fmod(p->headPosAux, 90) - 1 * p->headPosAux / 90;
-		p->headPosAux -= 4.0f;
-		if (p->headPosAux < 0.0f) {
-			p->headPosAux = 0.0f;
+		player.headPosAux = fmod(player.headPosAux, 90) - 1 * player.headPosAux / 90;
+		player.headPosAux -= 4.0f;
+		if (player.headPosAux < 0.0f) {
+			player.headPosAux = 0.0f;
 		}
 	}
 }
 
-void PlayerDraw(Player player) {
+void PlayerDraw() {
     glPushMatrix();
 
         float eyeY = player.y + 0.119 + 0.025 * std::abs(sin(player.headPosAux*PI/180));
@@ -95,4 +104,36 @@ void PlayerDraw(Player player) {
         glRotatef(180 - player.roty, 0, 1, 0);
         glmDraw(player.model, GLM_SMOOTH);
     glPopMatrix();
+}
+
+void PlayerHandleInput(unsigned char key, bool pressed){
+    switch (key) {
+		case 119: //w
+			player.goingForward = pressed;
+			break;
+		case 115: //s
+			player.goingBackward = pressed;
+			break;
+		case 97: //a
+            if (pressed && !player.turningRight)
+                player.turningLeft = true;
+			break;
+		case 100: //d
+		    if (pressed && !player.turningLeft)
+                player.turningRight = true;
+			break;
+		default:
+			break;
+	}
+}
+
+void setPlayerPosition() {
+    Map m = cloneMap();
+    int i, j;
+    for (i = 0; i < m.width; i++)
+        for (j = 0; j < m.width; j++)
+            if (getTile(i, j) == PLAYER) {
+                player.x = i * m.tileSize + m.tileSize/2.0;
+                player.z = j * m.tileSize + m.tileSize/2.0;
+            }
 }
