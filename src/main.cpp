@@ -82,7 +82,7 @@ float backgrundColor[4] = {0.529f,0.807f,0.980f,1.0f};
 
 Player player;
 Camera camera;
-Enemy enemy;
+Enemy* enemies;
 Map m;
 
 // Aux function to load the object using GLM and apply some functions
@@ -139,12 +139,17 @@ void mainInit() {
 	// habilita o z-buffer
 	glEnable(GL_DEPTH_TEST);
 
-    player = newPlayer();
-    camera = newCamera(&player, windowWidth, windowHeight);
-    enemy = newEnemy();
 	m = newMap("../../res/lower.bmp", "../../res/upper.bmp");
 
+	enemies = (Enemy*) malloc(sizeof(Enemy)*m.numEnemies);
+	for (i = 0; i < m.numEnemies; i++)
+        enemies[i] = newEnemy();
+
+    player = newPlayer();
+    camera = newCamera(&player, windowWidth, windowHeight);
+
 	setPlayerPosition(m, &player);
+	setEnemyPositions(m, enemies);
 
 	initLight();
 }
@@ -158,7 +163,8 @@ void renderScene() {
 
 	CameraUpdate(camera);
     PlayerDraw(player);
-    EnemyDraw(enemy);
+    for (i = 0; i < m.numEnemies; i++)
+        EnemyDraw(enemies[i]);
 
     // binds the bmp file already loaded to the OpenGL parameters
     //glBindTexture(GL_TEXTURE_2D, texture);
@@ -172,7 +178,8 @@ Render scene
 */
 void mainRender() {
 	PlayerUpdate(&player);
-    EnemyUpdate(&enemy, player);
+    for (i = 0; i < m.numEnemies; i++)
+        EnemyUpdate(&enemies[i], player);
 	renderScene();
 	glFlush();
 	glutPostRedisplay();

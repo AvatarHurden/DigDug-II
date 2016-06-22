@@ -114,6 +114,7 @@ void loadUpperFloor(Map* m, char* name) {
                 break;
             case 0xff0000:
                 tile = ENEMY;
+                m->numEnemies++;
                 break;
             case 0x0000ff:
                 tile = PLAYER;
@@ -146,6 +147,7 @@ Map newMap(char* lower_file_name, char* upper_file_name) {
     Map m;
     initTexture();
     m.tileSize = 0.4;
+    m.numEnemies = 0;
 
     loadLowerFloor(&m, lower_file_name);
     printf("loaded bottom");
@@ -196,8 +198,20 @@ void setPlayerPosition(Map map, Player* p) {
            }
 }
 
+void setEnemyPositions(Map map, Enemy* e) {
+
+    int index = 0, i, j;
+    for (i = 0; i < map.width; i++)
+       for (j = 0; j < map.width; j++)
+           if (getTile(map, i, j) == ENEMY) {
+               (e+index)->x = i * map.tileSize + map.tileSize/2.0;
+               (e+index)->z = j * map.tileSize + map.tileSize/2.0;
+               index++;
+           }
+}
+
 void MapDraw(Map m) {
-    
+
     // Aqui ele define qual a textura a ser usada para o tipo TEXTURE_2D,
     // Isso será mudado para cada bloco, imagino
     glBindTexture(GL_TEXTURE_2D, texture);
