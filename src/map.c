@@ -193,7 +193,11 @@ void setTile(int i, int j, TileType tile) {
     m.tiles[i + j * m.width] = tile;
 }
 
-
+TyleType getTileXZ(float x, float z){
+    int L = (int)(x/m.tileSize);
+    int C = (int)(z/m.tileSize);
+    return m.tiles[L + C*m.width];
+}
 
 void MapDraw() {
 
