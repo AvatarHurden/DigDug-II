@@ -20,6 +20,7 @@ void newMap(char* bitmapFloor, char* bitmapBlocks);
 void MapDraw();
 
 TileType getTile(int i, int j);
+TileType getTileXZ(float x, float z);
 void setTile(int i, int j, TileType tile);
 
 
