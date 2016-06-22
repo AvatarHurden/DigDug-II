@@ -16,14 +16,13 @@ typedef struct POSITION {
     int x, y;
 } Position;
 
-Map newMap(char* bitmapFloor, char* bitmapBlocks);
-void MapDraw(Map m);
+void newMap(char* bitmapFloor, char* bitmapBlocks);
+void MapDraw();
 
-TileType getTile(Map map, int i, int j);
-void setTile(Map* map, int i, int j, TileType tile);
+TileType getTile(int i, int j);
+void setTile(int i, int j, TileType tile);
 
-void setPlayerPosition(Map map, Player* p);
-void setEnemyPositions(Map map, Enemy** e);
-Position* getEnemyPositions(Map map);
+
+Position* getEnemyPositions();
 
 #endif // MAP_H_INCLUDED
