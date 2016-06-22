@@ -16,8 +16,9 @@ typedef struct PLAYER{
 } Player;
 
 
-Player newPlayer();
-void PlayerUpdate(Player* p);
-void PlayerDraw(Player p);
+void newPlayer();
+void PlayerUpdate();
+void PlayerDraw();
+void setPlayerPosition();
 
 #endif // PLAYER_H_INCLUDED
