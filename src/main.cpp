@@ -20,10 +20,12 @@ Arthur Vedana e Vitor Vanacor
 
 //bitmap class to load bitmaps for textures
 #include "bitmap.h"
-#include "player.c"
-#include "camera.c"
-#include "enemy.c"
 #include "map.c"
+#include "player.c"
+#include "enemy.c"
+#include "camera.c"
+
+
 
 #pragma comment(lib, "OpenAL32.lib")
 #pragma comment(lib, "alut.lib")
@@ -80,10 +82,7 @@ int i;                       /* Looping var */
 
 float backgrundColor[4] = {0.529f,0.807f,0.980f,1.0f};
 
-Player player;
-Camera camera;
 Enemy* enemies;
-Map m;
 
 // Aux function to load the object using GLM and apply some functions
 bool C3DObject_Load_New(const char *pszFilename, GLMmodel **model)
@@ -139,17 +138,16 @@ void mainInit() {
 	// habilita o z-buffer
 	glEnable(GL_DEPTH_TEST);
 
-	m = newMap("../../res/lower.bmp", "../../res/upper.bmp");
+	newMap("../../res/lower.bmp", "../../res/upper.bmp");
 
-	enemies = (Enemy*) malloc(sizeof(Enemy)*m.numEnemies);
-	for (i = 0; i < m.numEnemies; i++)
+	enemies = (Enemy*) malloc(sizeof(Enemy)*MapGetNumEnemies());
+	for (i = 0; i < MapGetNumEnemies(); i++)
         enemies[i] = newEnemy();
 
-    player = newPlayer();
-    camera = newCamera(&player, windowWidth, windowHeight);
+    newPlayer();
+    newCamera(windowWidth, windowHeight);
 
-	setPlayerPosition(m, &player);
-	setEnemyPositions(m, enemies);
+	setEnemyPositions(enemies);
 
 	initLight();
 }
@@ -161,25 +159,21 @@ void renderScene() {
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
-	CameraUpdate(camera);
-    PlayerDraw(player);
+	CameraUpdate();
+    PlayerDraw();
     for (i = 0; i < m.numEnemies; i++)
         EnemyDraw(enemies[i]);
 
-    // binds the bmp file already loaded to the OpenGL parameters
-    //glBindTexture(GL_TEXTURE_2D, texture);
-
-	//renderFloor();
-	MapDraw(m);
+	MapDraw();
 }
 
 /**
 Render scene
 */
 void mainRender() {
-	PlayerUpdate(&player);
+	PlayerUpdate();
     for (i = 0; i < m.numEnemies; i++)
-        EnemyUpdate(&enemies[i], player);
+        EnemyUpdate(&enemies[i]);
 	renderScene();
 	glFlush();
 	glutPostRedisplay();
@@ -213,24 +207,7 @@ Key press event handler
 */
 void onKeyDown(unsigned char key, int x, int y) {
 	//printf("%d \n", key);
-	switch (key) {
-		case 119: //w
-			player.goingForward = true;
-			break;
-		case 115: //s
-			player.goingBackward = true;
-			break;
-		case 97: //a
-            if (!player.turningRight)
-                player.turningLeft = true;
-			break;
-		case 100: //d
-		    if (!player.turningLeft)
-                player.turningRight = true;
-			break;
-		default:
-			break;
-	}
+	PlayerHandleInput(key, true);
 
 	//glutPostRedisplay();
 }
@@ -239,22 +216,9 @@ void onKeyDown(unsigned char key, int x, int y) {
 Key release event handler
 */
 void onKeyUp(unsigned char key, int x, int y) {
-	switch (key) {
-		case 119: //w
-			player.goingForward = false;
-			break;
-		case 115: //s
-			player.goingBackward = false;
-			break;
-        case 118: //v
-            CameraChangeType(&camera);
-            break;
-		case 27:
-			exit(0);
-			break;
-		default:
-			break;
-	}
+    PlayerHandleInput(key, false);
+    if (key == 118) CameraChangeType(); //v
+    if (key == 27) exit(0);
 
 	//glutPostRedisplay();
 }
@@ -262,7 +226,7 @@ void onKeyUp(unsigned char key, int x, int y) {
 void onWindowReshape(int x, int y) {
 	windowWidth = x;
 	windowHeight = y;
-	camera = newCamera(&player, windowWidth, windowHeight);
+	newCamera(windowWidth, windowHeight);
 	setViewport(0, windowWidth, 0, windowHeight);
 }
 
