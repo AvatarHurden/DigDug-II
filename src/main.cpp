@@ -76,35 +76,14 @@ double yOffset = -1.3;
 int mouseLastX = 0;
 int mouseLastY = 0;
 
-float planeSize = 8.0f;
-
-// parte de código extraído de "texture.c" por Michael Sweet (OpenGL SuperBible)
-// texture buffers and stuff
 int i;                       /* Looping var */
-BITMAPINFO	*info;           /* Bitmap information */
-GLubyte	    *bits;           /* Bitmap RGB pixels */
-GLubyte     *ptr;            /* Pointer into bit buffer */
-GLubyte	    *rgba;           /* RGBA pixel buffer */
-GLubyte	    *rgbaptr;        /* Pointer into RGBA buffer */
-GLubyte     temp;            /* Swapping variable */
-GLenum      type;            /* Texture type */
-//GLuint      texture;         /* Texture object */
 
 float backgrundColor[4] = {0.529f,0.807f,0.980f,1.0f};
 
-int totalObjects = 0;
-struct object
-{
-    GLMmodel *model;
-    int x;
-    int z;
-    double y;
-} objects[500];
-
-Player player = newPlayer();
-Camera camera = newCamera(&player, windowWidth, windowHeight);
-Enemy enemy = newEnemy();
-Map m = newMap("../../res/lower.bmp", "../../res/upper.bmp");
+Player player;
+Camera camera;
+Enemy enemy;
+Map m;
 
 // Aux function to load the object using GLM and apply some functions
 bool C3DObject_Load_New(const char *pszFilename, GLMmodel **model)
@@ -160,108 +139,15 @@ void mainInit() {
 	// habilita o z-buffer
 	glEnable(GL_DEPTH_TEST);
 
-    initTexture();
+    player = newPlayer();
+    camera = newCamera(&player, windowWidth, windowHeight);
+    enemy = newEnemy();
+	m = newMap("../../res/lower.bmp", "../../res/upper.bmp");
 
-	//initModel();
+	setPlayerPosition(m, &player);
 
 	initLight();
 }
-
-
-
-/**
-Initialize the texture using the library bitmap
-
-void initTexture(void)
-{
-    printf ("\nLoading texture..\n");
-    // Load a texture object (256x256 true color)
-    bits = LoadDIBitmap("../../res/tiledbronze.bmp", &info);
-    if (bits == (GLubyte *)0) {
-		printf ("Error loading texture!\n\n");
-		return;
-	}
-    // Figure out the type of texture
-    if (info->bmiHeader.biHeight == 1)
-      type = GL_TEXTURE_1D;
-    else
-      type = GL_TEXTURE_2D;
-
-    // Create and bind a texture object
-    glGenTextures(1, &texture);
-	glBindTexture(type, texture);
-
-    // Create an RGBA image
-    rgba = (GLubyte *)malloc(info->bmiHeader.biWidth * info->bmiHeader.biHeight * 4);
-
-    i = info->bmiHeader.biWidth * info->bmiHeader.biHeight;
-    for( rgbaptr = rgba, ptr = bits;  i > 0; i--, rgbaptr += 4, ptr += 3)
-    {
-            rgbaptr[0] = ptr[2];     // windows BMP = BGR
-            rgbaptr[1] = ptr[1];
-            rgbaptr[2] = ptr[0];
-            rgbaptr[3] = (ptr[0] + ptr[1] + ptr[2]) / 3;
-    }
-
-	// Set texture parameters
-	glTexParameteri(type, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(type, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(type, GL_TEXTURE_WRAP_S, GL_CLAMP);
-    glTexParameteri(type, GL_TEXTURE_WRAP_T, GL_CLAMP);
-
-    glTexImage2D(type, 0, 4, info->bmiHeader.biWidth, info->bmiHeader.biHeight,
-                  0, GL_RGBA, GL_UNSIGNED_BYTE, rgba );
-
-
-    printf("Textura %d\n", texture);
-	printf("Textures ok.\n\n", texture);
-
-}
-
-void renderFloor() {
-	// set things up to render the floor with the texture
-	glShadeModel(GL_SMOOTH);
-	glEnable(type);
-    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-
-	glPushMatrix();
-
-    glTranslatef(-(float)planeSize/2.0f, 0.0f, -(float)planeSize/2.0f);
-
-	float textureScaleX = 10.0;
-	float textureScaleY = 10.0;
-    glColor4f(1.0f,1.0f,1.0f,1.0f);
-    int xQuads = 100;
-    int zQuads = 100;
-    int divider = 40;
-    for (int i = 0; i < xQuads; i++) {
-        for (int j = 0; j < zQuads; j++) {
-            glBegin(GL_QUADS);
-                glTexCoord2f(1.0f, 0.0f);   // coords for the texture
-                glNormal3f(0.0f,1.0f,0.0f);
-                glVertex3f(i * (float)planeSize/divider, 0.0f, (j+1) * (float)planeSize/divider);
-
-                glTexCoord2f(0.0f, 0.0f);  // coords for the texture
-                glNormal3f(0.0f,1.0f,0.0f);
-                glVertex3f((i+1) * (float)planeSize/divider, 0.0f, (j+1) * (float)planeSize/divider);
-
-                glTexCoord2f(0.0f, 1.0f);  // coords for the texture
-                glNormal3f(0.0f,1.0f,0.0f);
-                glVertex3f((i+1) * (float)planeSize/divider, 0.0f, j * (float)planeSize/divider);
-
-                glTexCoord2f(1.0f, 1.0f);  // coords for the texture
-                glNormal3f(0.0f,1.0f,0.0f);
-                glVertex3f(i * (float)planeSize/divider, 0.0f, j * (float)planeSize/divider);
-
-            glEnd();
-        }
-    }
-
-	glDisable(type);
-
-	glPopMatrix();
-}
-*/
 
 void renderScene() {
 	glClearColor(backgrundColor[0],backgrundColor[1],backgrundColor[2],backgrundColor[3]);
@@ -274,15 +160,8 @@ void renderScene() {
     PlayerDraw(player);
     EnemyDraw(enemy);
 
-    for (i=0; i<totalObjects; i++){
-        glPushMatrix();
-            glTranslatef(GLfloat(objects[i].x - 3), GLfloat(objects[i].y), GLfloat(objects[i].z - 3));
-            glmDraw(objects[i].model, GLM_SMOOTH);
-        glPopMatrix();
-    }
-
     // binds the bmp file already loaded to the OpenGL parameters
-    glBindTexture(type, texture);
+    //glBindTexture(GL_TEXTURE_2D, texture);
 
 	//renderFloor();
 	MapDraw(m);

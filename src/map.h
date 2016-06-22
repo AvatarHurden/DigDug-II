@@ -19,7 +19,7 @@ void MapDraw(Map m);
 TileType getTile(Map map, int i, int j);
 void setTile(Map* map, int i, int j, TileType tile);
 
-Position getPlayerPosition(Map map);
+void setPlayerPosition(Map map, Player* p);
 Position* getEnemyPositions(Map map);
 
 #endif // MAP_H_INCLUDED

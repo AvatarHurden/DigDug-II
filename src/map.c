@@ -185,9 +185,23 @@ void setTile(Map* map, int i, int j, TileType tile) {
     map->tiles[i + j * map->width] = tile;
 }
 
-void MapDraw(Map m) {
+void setPlayerPosition(Map map, Player* p) {
 
-    // set things up to render the floor with the texture
+   int i, j;
+   for (i = 0; i < map.width; i++)
+       for (j = 0; j < map.width; j++)
+           if (getTile(map, i, j) == PLAYER) {
+               p->x = i * map.tileSize + map.tileSize/2.0;
+               p->z = j * map.tileSize + map.tileSize/2.0;
+           }
+}
+
+void MapDraw(Map m) {
+    
+    // Aqui ele define qual a textura a ser usada para o tipo TEXTURE_2D,
+    // Isso será mudado para cada bloco, imagino
+    glBindTexture(GL_TEXTURE_2D, texture);
+
 	glShadeModel(GL_SMOOTH);
 	glEnable(GL_TEXTURE_2D);
     glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);

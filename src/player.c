@@ -18,6 +18,8 @@ Player newPlayer(){
     p.roty = 0;
     p.rotx = 90.0f;
 
+    p.goingForward = false;
+    p.goingBackward = false;
     p.turningLeft = false;
     p.turningRight = false;
     p.headPosAux = 0.0f;
