@@ -80,10 +80,10 @@ void PlayerUpdate() {
             newX = player.x - player.speedX;
             newZ = player.z - player.speedZ;
         }
-        //if (getTileType(map, newX, newZ) != BLOCK){
+        if (getTileXZ(newX, newZ) != BLOCK){
             player.x = newX;
             player.z = newZ;
-        //}
+        }
 
 	} else {
 		// parou de andar, para com o efeito de "sobe e desce"
