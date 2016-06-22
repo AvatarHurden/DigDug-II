@@ -11,9 +11,9 @@ typedef struct CAMERA{
     int windowHeight;
 } Camera;
 
-Camera newCamera(Player* p, int width, int height);
-void CameraUpdate(Camera c);
-void CameraChangeType(Camera* c);
-void CameraResize(Camera* c, int w, int h);
+void newCamera(int width, int height);
+void CameraUpdate();
+void CameraChangeType();
+void CameraResize(int w, int h);
 
 #endif // CAMERA_H_INCLUDED
