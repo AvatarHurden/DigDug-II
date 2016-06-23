@@ -120,17 +120,17 @@ void PlayerDraw() {
 
 void PlayerHandleInput(unsigned char key, bool pressed){
     switch (key) {
-		case 119: //w
+		case 'w':
 			player.goingForward = pressed;
 			break;
-		case 115: //s
+		case 's':
 			player.goingBackward = pressed;
 			break;
-		case 97: //a
+		case 'a':
             if (pressed && !player.turningRight)
                 player.turningLeft = true;
 			break;
-		case 100: //d
+		case 'd':
 		    if (pressed && !player.turningLeft)
                 player.turningRight = true;
 			break;

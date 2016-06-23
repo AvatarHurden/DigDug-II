@@ -25,8 +25,6 @@ Arthur Vedana e Vitor Vanacor
 #include "enemy.c"
 #include "camera.c"
 
-
-
 #pragma comment(lib, "OpenAL32.lib")
 #pragma comment(lib, "alut.lib")
 
@@ -58,6 +56,7 @@ void setViewport(GLint left, GLint right, GLint bottom, GLint top);
 void updateState();
 void renderFloor();
 void updateCam();
+void newGame();
 
 /**
 Screen dimensions
@@ -112,15 +111,18 @@ void mainInit() {
 
 	// habilita o z-buffer
 	glEnable(GL_DEPTH_TEST);
+	//	glEnable(GL_FOG);
+    //	glFogfv(GL_FOG_COLOR, backgrundColor);
+    //	glFogf(GL_FOG_DENSITY, 0.1);
+	initLight();
+	newGame();
+}
 
-	newMap("../../res/lower.bmp", "../../res/upper.bmp");
+void newGame(){
+    newMap("../../res/lower.bmp", "../../res/upper.bmp");
     newPlayer();
     newEnemies();
     newCamera(windowWidth, windowHeight);
-
-
-
-	initLight();
 }
 
 void renderScene() {
@@ -219,11 +221,9 @@ void mainCreateMenu() {
 Key press event handler
 */
 void onKeyDown(unsigned char key, int x, int y) {
-	//printf("%d \n", key);
 	PlayerHandleInput(key, true);
 	if (key == ' ') tentaCavar();
-
-	//glutPostRedisplay();
+	if (key == 'r') newGame();
 }
 
 /**
@@ -233,8 +233,6 @@ void onKeyUp(unsigned char key, int x, int y) {
     PlayerHandleInput(key, false);
     if (key == 118) CameraChangeType(); //v
     if (key == 27) exit(0);
-
-	//glutPostRedisplay();
 }
 
 void onWindowReshape(int x, int y) {
@@ -244,15 +242,7 @@ void onWindowReshape(int x, int y) {
 	setViewport(0, windowWidth, 0, windowHeight);
 }
 
-/**
-Glut idle funtion
-*/
 void mainIdle() {
-	/**
-	Set the active window before send an glutPostRedisplay call
-	so it wont be accidently sent to the glui window
-	*/
-
 	glutSetWindow(mainWindowId);
 	glutPostRedisplay();
 }
@@ -262,28 +252,14 @@ int main(int argc, char **argv) {
 	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGBA | GLUT_DEPTH);
 	glutInitWindowSize(windowWidth,windowHeight);
 	glutInitWindowPosition(windowXPos,windowYPos);
-
-	/**
-	Store main window id so that glui can send it redisplay events
-	*/
 	mainWindowId = glutCreateWindow("FPS");
 
 	glutDisplayFunc(mainRender);
-
 	glutReshapeFunc(onWindowReshape);
-
-	/**
-	Register keyboard events handlers
-	*/
 	glutKeyboardFunc(onKeyDown);
 	glutKeyboardUpFunc(onKeyUp);
 
-//	glEnable(GL_FOG);
-//	glFogfv(GL_FOG_COLOR, backgrundColor);
-//	glFogf(GL_FOG_DENSITY, 0.1);
-
 	mainInit();
-
 	glutMainLoop();
 
     return 0;
