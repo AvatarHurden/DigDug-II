@@ -12,6 +12,8 @@ typedef struct PLAYER{
     int roty;
     float rotx;
     bool turningLeft, turningRight, goingForward, goingBackward;
+    bool digging;
+    int diggingTime;
     float headPosAux;
 } Player;
 

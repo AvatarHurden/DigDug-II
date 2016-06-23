@@ -3,6 +3,7 @@
 
 typedef enum {EMPTY, NORMAL, BLOCK, HOLE, CRACK, ENEMY, PLAYER} TileType;
 
+
 typedef struct Map{
     TileType* tiles;
     float tileSize;
@@ -16,7 +17,7 @@ typedef struct Map{
 } Map;
 
 typedef struct POSITION {
-    int x, y;
+    int x, z;
 } Position;
 
 void newMap(char* bitmapFloor, char* bitmapBlocks);
@@ -24,6 +25,7 @@ void MapDraw();
 
 TileType getTile(int i, int j);
 TileType getTileXZ(float x, float z);
+Position getPositionXZ(float x, float z);
 bool hasTypeAt(float x, float z, float radius, TileType type);
 void setTile(int i, int j, TileType tile);
 

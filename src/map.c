@@ -210,6 +210,13 @@ TileType getTileXZ(float x, float z){
     return m.tiles[L + C*m.width];
 }
 
+Position getPositionXZ(float x, float z) {
+    Position p;
+    p.x = (int)(x/m.tileSize);
+    p.z = (int)(z/m.tileSize);
+    return p;
+}
+
 bool hasTypeAt(float x, float z, float radius, TileType type) {
 
     return getTileXZ(x+radius, z+radius) == type ||
@@ -404,6 +411,14 @@ void drawWall(int i, int j, int level, int direction) {
         z1 = j, z2 = j+1;
         break;
     }
+
+
+    glMatrixMode(GL_TEXTURE);
+        glLoadIdentity();
+        glTranslatef(0.5,0.5,0.0);
+        glRotatef(0,0.0,0.0,1.0);
+        glTranslatef(-0.5,-0.5,0.0);
+    glMatrixMode(GL_MODELVIEW);
 
     glBegin(GL_QUADS);
         glTexCoord2f(0.0f, 1.0f);

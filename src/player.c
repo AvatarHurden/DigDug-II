@@ -24,6 +24,8 @@ void newPlayer(){
     player.goingBackward = false;
     player.turningLeft = false;
     player.turningRight = false;
+    player.digging = false;
+    player.diggingTime = 10;
     player.headPosAux = 0.0f;
 
     setPlayerPosition();
@@ -46,7 +48,17 @@ void loadModel() {
 
 void PlayerUpdate() {
     //printf("Player Update\n");
-    if (player.turningRight || player.turningLeft) {
+    if (player.digging) {
+        player.headPosAux += 34.0f;
+		if (player.headPosAux > 180.0f) {
+			player.headPosAux = 0.0f;
+		}
+		player.diggingTime--;
+		if (player.diggingTime == 0) {
+            player.digging = 0;
+            player.diggingTime = 10;
+		}
+    } else if (player.turningRight || player.turningLeft) {
         if (player.turningRight) {
             player.roty += 10;
             if (player.roty % 90 == 0)
@@ -72,6 +84,7 @@ void PlayerUpdate() {
 		if (player.headPosAux > 180.0f) {
 			player.headPosAux = 0.0f;
 		}
+
         float newX, newZ;
         if (player.goingForward) {
             newX = player.x + player.speedX;
