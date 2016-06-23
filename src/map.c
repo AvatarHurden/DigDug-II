@@ -152,10 +152,10 @@ void loadUpperFloor(char* name) {
 
 void newMap(char* lower_file_name, char* upper_file_name) {
 
-    initTexture("../../res/normal_lateral.bmp", &m.chao_lateral);
-    initTexture("../../res/normal_topo.bmp", &m.chao_topo);
-    initTexture("../../res/bloco_lateral.bmp", &m.bloco_lateral);
-    initTexture("../../res/bloco_topo.bmp", &m.bloco_topo);
+    initTexture("../../res/normallateral.bmp", &m.chao_lateral);
+    initTexture("../../res/normaltopo.bmp", &m.chao_topo);
+    initTexture("../../res/blocolateral.bmp", &m.bloco_lateral);
+    initTexture("../../res/blocotopo.bmp", &m.bloco_topo);
     initTexture("../../res/buraco.bmp", &m.buraco);
     initTexture("../../res/buraco1rachadura.bmp", &m.buraco_1_rachadura);
     initTexture("../../res/buraco2rachadurasparalelas.bmp", &m.buraco_2_rachaduras_paralelas);
