@@ -1,6 +1,8 @@
 #include "map.h"
 
-void drawBlock(int i, int j, int height);
+void drawBlock(int i, int j, int height, int rotation);
+void drawHole(int i, int j);
+void drawCrack(int i, int j);
 void drawWall(int i, int j, int height, int direction);
 
 Map m;
@@ -150,9 +152,18 @@ void loadUpperFloor(char* name) {
 
 void newMap(char* lower_file_name, char* upper_file_name) {
 
-    initTexture("../../res/chao_lateral.bmp", &m.chao_lateral);
-    initTexture("../../res/chao_topo.bmp", &m.chao_topo);
-    initTexture("../../res/tiledbronze.bmp", &m.rest);
+    initTexture("../../res/normal_lateral.bmp", &m.chao_lateral);
+    initTexture("../../res/grass.bmp", &m.chao_topo);
+    initTexture("../../res/bloco_lateral.bmp", &m.bloco_lateral);
+    initTexture("../../res/bloco_topo.bmp", &m.bloco_topo);
+    initTexture("../../res/buraco.bmp", &m.buraco);
+    initTexture("../../res/buraco1rachadura.bmp", &m.buraco_1_rachadura);
+    initTexture("../../res/buraco2rachadurasparalelas.bmp", &m.buraco_2_rachaduras_paralelas);
+    initTexture("../../res/buraco2rachadurasperpendiculares.bmp", &m.buraco_2_rachaduras_perpendiculares);
+    initTexture("../../res/buraco3rachaduras.bmp", &m.buraco_3_rachaduras);
+    initTexture("../../res/buraco4rachaduras.bmp", &m.buraco_4_rachaduras);
+    initTexture("../../res/rachadura.bmp", &m.rachadura);
+    initTexture("../../res/rachaduracruzada.bmp", &m.rachadura_cruzada);
     m.tileSize = 0.4;
     m.numEnemies = 0;
 
@@ -209,9 +220,6 @@ bool hasTypeAt(float x, float z, float radius, TileType type) {
 
 void MapDraw() {
 
-    // Aqui ele define qual a textura a ser usada para o tipo TEXTURE_2D,
-    // Isso será mudado para cada bloco, imagino
-
 	glShadeModel(GL_SMOOTH);
 	glEnable(GL_TEXTURE_2D);
     glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
@@ -230,9 +238,16 @@ void MapDraw() {
         for (int j = 0; j < zQuads; j++) {
             switch (getTile(i, j)) {
                 case EMPTY: continue;
+                case HOLE:
+                    glBindTexture(GL_TEXTURE_2D, m.buraco);
+                    drawHole(i, j);
+                    break;
+                case CRACK:
+                    drawCrack(i, j);
+                    break;
                 case BLOCK:
-                    glBindTexture(GL_TEXTURE_2D, m.rest);
-                    drawBlock(i, j, 1);
+                    glBindTexture(GL_TEXTURE_2D, m.bloco_topo);
+                    drawBlock(i, j, 1, 0);
                     drawWall(i, j, 1, 0);
                     drawWall(i, j, 1, 1);
                     drawWall(i, j, 1, 2);
@@ -240,7 +255,7 @@ void MapDraw() {
                     break;
                 default:
                     glBindTexture(GL_TEXTURE_2D, m.chao_topo);
-                    drawBlock(i, j, 0);
+                    drawBlock(i, j, 0, 0);
                 }
             if (getTile(i, j+1) == EMPTY)
                 drawWall(i, j, 0, 0);
@@ -259,8 +274,15 @@ void MapDraw() {
 
 }
 
-void drawBlock(int i, int j, int level) {
+void drawBlock(int i, int j, int level, int rotation) {
     float size = m.tileSize;
+
+    glMatrixMode(GL_TEXTURE);
+        glLoadIdentity();
+        glTranslatef(0.5,0.5,0.0);
+        glRotatef(rotation,0.0,0.0,1.0);
+        glTranslatef(-0.5,-0.5,0.0);
+    glMatrixMode(GL_MODELVIEW);
 
     glBegin(GL_QUADS);
         glTexCoord2f(1.0f, 0.0f);   // coords for the texture
@@ -281,9 +303,86 @@ void drawBlock(int i, int j, int level) {
     glEnd();
 }
 
+void drawHole(int i, int j) {
+
+    int cracks = 0;
+    if (getTile(i+1, j) == CRACK) cracks++;
+    if (getTile(i, j+1) == CRACK) cracks++;
+    if (getTile(i-1, j) == CRACK) cracks++;
+    if (getTile(i, j-1) == CRACK) cracks++;
+
+    GLuint texture;
+    int rotation = 0;
+    switch (cracks) {
+    case 0: texture = m.buraco; break;
+    case 1:
+        texture = m.buraco_1_rachadura;
+        if (getTile(i+1, j) == CRACK) rotation = 90;
+        if (getTile(i, j+1) == CRACK) rotation = 0;
+        if (getTile(i-1, j) == CRACK) rotation = -90;
+        if (getTile(i, j-1) == CRACK) rotation = 180;
+        break;
+    case 3:
+        texture = m.buraco_3_rachaduras;
+        if (getTile(i+1, j) != CRACK) rotation = 0;
+        if (getTile(i, j+1) != CRACK) rotation = -90;
+        if (getTile(i-1, j) != CRACK) rotation = 180;
+        if (getTile(i, j-1) != CRACK) rotation = 90;
+        break;
+    case 4:
+        texture = m.buraco_4_rachaduras; break;
+    case 2:
+        if (getTile(i+1, j) == getTile(i-1, j) ||
+            getTile(i, j+1) == getTile(i, j-1)) {
+            texture = m.buraco_2_rachaduras_paralelas;
+            rotation = (getTile(i+1, j) == CRACK) ? 90 : 0;
+        } else
+            texture = m.buraco_2_rachaduras_perpendiculares;
+            if (getTile(i+1, j) == CRACK && getTile(i, j+1) == CRACK) rotation = 90;
+            if (getTile(i, j+1) == CRACK && getTile(i-1, j) == CRACK) rotation = 0;
+            if (getTile(i-1, j) == CRACK && getTile(i, j-1) == CRACK) rotation = -90;
+            if (getTile(i, j-1) == CRACK && getTile(i+1, j) == CRACK) rotation = 180;
+
+        break;
+    }
+
+    glBindTexture(GL_TEXTURE_2D, texture);
+    drawBlock(i, j, 0, rotation);
+
+}
+
+void drawCrack(int i, int j) {
+
+    int neighbors = 0;
+    if (getTile(i+1, j) == CRACK || getTile(i-1, j) == CRACK ||
+        getTile(i+1, j) == HOLE || getTile(i-1, j) == HOLE)
+            neighbors++;
+    if (getTile(i, j+1) == CRACK || getTile(i, j-1) == CRACK ||
+        getTile(i, j+1) == HOLE || getTile(i, j-1) == HOLE)
+            neighbors++;
+
+    GLuint texture;
+    int rotation = 0;
+    switch (neighbors) {
+    case 1:
+        texture = m.rachadura;
+        if (getTile(i+1, j) == CRACK || getTile(i-1, j) == CRACK ||
+            getTile(i+1, j) == HOLE || getTile(i-1, j) == HOLE) rotation = 90;
+        break;
+    case 2: texture = m.rachadura_cruzada; break;
+    }
+
+    glBindTexture(GL_TEXTURE_2D, texture);
+    drawBlock(i, j, 0, rotation);
+
+}
+
 void drawWall(int i, int j, int level, int direction) {
 
-    glBindTexture(GL_TEXTURE_2D, m.chao_lateral);
+   if (level == 1)
+        glBindTexture(GL_TEXTURE_2D, m.bloco_lateral);
+    else
+        glBindTexture(GL_TEXTURE_2D, m.chao_lateral);
 
     float size = m.tileSize;
     float x1, x2, z1, z2;
@@ -307,7 +406,7 @@ void drawWall(int i, int j, int level, int direction) {
     }
 
     glBegin(GL_QUADS);
-        glTexCoord2f(1.0f, 0.0f);
+        glTexCoord2f(0.0f, 1.0f);
         glNormal3f(0.0f,1.0f,0.0f);
         glVertex3f(x1 * size, level*blockSize, z1 * size);
 
@@ -317,7 +416,7 @@ void drawWall(int i, int j, int level, int direction) {
             glNormal3f(0.0f,1.0f,0.0f);
             glVertex3f(x2 * size, (level-1)*blockSize, z1 * size);
 
-            glTexCoord2f(0.0f, 1.0f);
+            glTexCoord2f(1.0f, 0.0f);
             glNormal3f(0.0f,1.0f,0.0f);
             glVertex3f(x1 * size, (level-1)*blockSize, z2 * size);
         } else {
@@ -325,7 +424,7 @@ void drawWall(int i, int j, int level, int direction) {
             glNormal3f(0.0f,1.0f,0.0f);
             glVertex3f(x1 * size, (level-1)*blockSize, z2 * size);
 
-            glTexCoord2f(0.0f, 1.0f);
+            glTexCoord2f(1.0f, 0.0f);
             glNormal3f(0.0f,1.0f,0.0f);
             glVertex3f(x2 * size, (level-1)*blockSize, z1 * size);
         }
