@@ -150,7 +150,9 @@ void loadUpperFloor(char* name) {
     }
 }
 
-void newMap(char* lower_file_name, char* upper_file_name) {
+void newMap() {
+    char* lower_file_name = "../../res/lower.bmp";
+    char* upper_file_name = "../../res/upper.bmp";
 
     initTexture("../../res/normallateral.bmp", &m.chao_lateral);
     initTexture("../../res/normaltopo.bmp", &m.chao_topo);

@@ -24,8 +24,8 @@ void newPlayer(){
     player.goingBackward = false;
     player.turningLeft = false;
     player.turningRight = false;
-    player.digging = false;
-    player.diggingTime = 10;
+    player.drilling = false;
+    player.drillingTime = 10;
     player.headPosAux = 0.0f;
 
     setPlayerPosition();
@@ -47,18 +47,18 @@ void loadModel() {
 }
 
 void PlayerUpdate() {
-    if (player.digging) {
-        player.headPosAux += 34.0f;
+    if (player.turningRight ^ player.turningLeft) {
+        PlayerTurn();
+    } else if (player.drilling) {
+        player.headPosAux += 90.0f;
 		if (player.headPosAux > 180.0f) {
 			player.headPosAux = 0.0f;
 		}
-		player.diggingTime--;
-		if (player.diggingTime == 0) {
-            player.digging = false;
-            player.diggingTime = 10;
+		player.drillingTime--;
+		if (player.drillingTime == 0) {
+            player.drilling = false;
+            player.drillingTime = 10;
 		}
-    } else if (player.turningRight ^ player.turningLeft) {
-        PlayerTurn();
     } else if (player.goingForward ^ player.goingBackward) {
         PlayerMove();
 	} else {
@@ -105,6 +105,47 @@ void PlayerMove(){
 
 void PlayerFall(){
     player.y -= 0.1;
+}
+
+void PlayerDrill() {
+    if (player.drilling)
+        return;
+    player.drilling = true;
+    if (getTileXZ(player.x, player.z) != HOLE)
+        return;
+    int dir = player.roty / 90;
+    int zIncrement = 0, xIncrement = 0;
+    if (dir == 0)
+        zIncrement = -1;
+    else if (dir == 1)
+        xIncrement = 1;
+    else if (dir == 2)
+        zIncrement = 1;
+    else
+        xIncrement = -1;
+
+    Position start = getPositionXZ(player.x, player.z);
+    do {
+        start.x += xIncrement;
+        start.z += zIncrement;
+        if (getTile(start.x, start.z) == BLOCK)
+            return;
+        int i;
+        for (i = 0; i < m.numEnemies; i++)
+            if (getPositionXZ(enemies[i].x, enemies[i].z).x == start.x &&
+                getPositionXZ(enemies[i].x, enemies[i].z).z == start.z) {
+                return;
+            }
+    } while (getTile(start.x, start.z) != EMPTY);
+
+    start = getPositionXZ(player.x, player.z);
+    start.x += xIncrement;
+    start.z += zIncrement;
+    while (getTile(start.x, start.z) != EMPTY) {
+        setTile(start.x, start.z, CRACK);
+        start.x += xIncrement;
+        start.z += zIncrement;
+    }
 }
 
 void PlayerDraw() {

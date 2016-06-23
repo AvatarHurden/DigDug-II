@@ -20,7 +20,7 @@ typedef struct POSITION {
     int x, z;
 } Position;
 
-void newMap(char* bitmapFloor, char* bitmapBlocks);
+void newMap();
 void MapDraw();
 
 TileType getTile(int i, int j);

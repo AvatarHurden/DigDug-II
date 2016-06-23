@@ -11,8 +11,8 @@ typedef struct PLAYER{
     float speedZ;
     int roty;
     float rotx;
-    bool digging;
-    int diggingTime;
+    bool drilling;
+    int drillingTime;
     bool turningLeft, turningRight, goingForward, goingBackward;
     float headPosAux;
 } Player;
@@ -25,5 +25,6 @@ void setPlayerPosition();
 void PlayerTurn();
 void PlayerMove();
 void PlayerFall();
+void PlayerDrill();
 
 #endif // PLAYER_H_INCLUDED
