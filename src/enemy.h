@@ -16,9 +16,16 @@ typedef struct ENEMY {
     int walkingTime;
 } Enemy;
 
+void newEnemies();
 Enemy newEnemy();
+void EnemyUpdateAll();
 void EnemyUpdate(Enemy* e);
+void EnemyDrawAll();
 void EnemyDraw(Enemy e);
-void setEnemyPositions(Enemy** e);
+void setEnemyPositions(Enemy* e);
+void EnemyTurn(Enemy* e);
+void EnemyMove(Enemy* e);
+void EnemyDecideAction(Enemy* e);
+
 
 #endif // ENEMY_H_INCLUDED

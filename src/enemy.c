@@ -5,6 +5,16 @@
 
 void loadModel(Enemy* e);
 
+Enemy* enemies;
+
+void newEnemies(){
+    enemies = (Enemy*) malloc(sizeof(Enemy)*MapGetNumEnemies());
+    int i;
+	for (i = 0; i < MapGetNumEnemies(); i++)
+        enemies[i] = newEnemy();
+    setEnemyPositions(enemies);
+}
+
 Enemy newEnemy(){
     printf("New Enemy.\n");
     Enemy e;
@@ -37,41 +47,63 @@ void loadModel(Enemy* e) {
     glmVertexNormals(e->model, 90.0);
 }
 
+void EnemyUpdateAll(){
+    int i;
+    for (i = 0; i < m.numEnemies; i++)
+        EnemyUpdate(&enemies[i]);
+}
+
 void EnemyUpdate(Enemy* e) {
-    if (e->turningRight || e->turningLeft) {
+    EnemyDecideAction(e);
+    if (e->turningRight ^ e->turningLeft) {
         e->lastTurnTime = time(NULL);
-
-        if (e->turningRight) {
-            e->roty += 10;
-            if (e->roty % 90 == 0)
-                e->turningRight = false;
-        } else if (e->turningLeft) {
-            e->roty -= 10;
-            if (e->roty % 90 == 0)
-                e->turningLeft = false;
-        }
-
-        if (e->roty >= 360)
-            e->roty -= 360;
-        else if (e->roty <= 0)
-            e->roty += 360;
-
+        EnemyTurn(e);
     } else {
+        EnemyMove(e);
+    }
+}
 
-        e->speedX = -0.025 * sin(e->roty*PI/180);
-		e->speedZ = -0.025 * cos(e->roty*PI/180);
+void EnemyTurn(Enemy* e){
+    int direction = e->turningRight - e->turningLeft;
+    e->roty += 10*direction;
+    if (e->roty % 90 == 0){
+        e->turningRight = false;
+        e->turningLeft = false;
+    }
+    if (e->roty >= 360)
+        e->roty -= 360;
+    else if (e->roty < 0)
+        e->roty += 360;
+}
 
-        e->x += e->speedX;
-        e->z += e->speedZ;
+void EnemyMove(Enemy* e){
+    e->speedX = -0.025 * sin(e->roty*PI/180);
+    e->speedZ = -0.025 * cos(e->roty*PI/180);
+    float newX = e->x + e->speedX;
+    float newZ = e->z + e->speedZ;
+    if (!hasTypeAt(newX, newZ, 0.075, BLOCK) &&
+        !hasTypeAt(newX, newZ, 0.075, EMPTY)){
+        e->x = newX;
+        e->z = newZ;
+    } else {
+        e->turningRight = true;
+    }
+}
 
-        if (time(NULL) - e->lastTurnTime > e->walkingTime) {
-            if (rand() % 2 == 0)
-                e->turningLeft = true;
-            else
-                e->turningRight = true;
-            e->walkingTime = rand() % 3 + 1;
-        }
-	}
+void EnemyDecideAction(Enemy* e){
+    if (time(NULL) - e->lastTurnTime > e->walkingTime) {
+        if (rand() % 2 == 0)
+            e->turningLeft = true;
+        else
+            e->turningRight = true;
+        e->walkingTime = rand() % 3 + 1;
+    }
+}
+
+void EnemyDrawAll(){
+    int i;
+    for (i = 0; i < m.numEnemies; i++)
+        EnemyDraw(enemies[i]);
 }
 
 void EnemyDraw(Enemy enemy) {

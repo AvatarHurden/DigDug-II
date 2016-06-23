@@ -82,31 +82,6 @@ int i;                       /* Looping var */
 
 float backgrundColor[4] = {0.529f,0.807f,0.980f,1.0f};
 
-Enemy* enemies;
-
-// Aux function to load the object using GLM and apply some functions
-bool C3DObject_Load_New(const char *pszFilename, GLMmodel **model)
-{
-    char aszFilename[256];
-    strcpy(aszFilename, pszFilename);
-
-    if (*model) {
-        free(*model);
-        *model = NULL;
-    }
-
-    *model = glmReadOBJ(aszFilename);
-    if (!(*model))
-    return false;
-
-    glmUnitize(*model);
-    glmScale(*model,0.12); // USED TO SCALE THE OBJECT
-    glmFacetNormals(*model);
-    glmVertexNormals(*model, 90.0);
-
-    return true;
-}
-
 void initLight() {
     glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
@@ -139,15 +114,11 @@ void mainInit() {
 	glEnable(GL_DEPTH_TEST);
 
 	newMap("../../res/lower.bmp", "../../res/upper.bmp");
-
-	enemies = (Enemy*) malloc(sizeof(Enemy)*MapGetNumEnemies());
-	for (i = 0; i < MapGetNumEnemies(); i++)
-        enemies[i] = newEnemy();
-
     newPlayer();
+    newEnemies();
     newCamera(windowWidth, windowHeight);
 
-	setEnemyPositions(enemies);
+
 
 	initLight();
 }
@@ -161,8 +132,7 @@ void renderScene() {
 
 	CameraUpdate();
     PlayerDraw();
-    for (i = 0; i < m.numEnemies; i++)
-        EnemyDraw(enemies[i]);
+    EnemyDrawAll();
 
 	MapDraw();
 }
@@ -172,8 +142,7 @@ Render scene
 */
 void mainRender() {
 	PlayerUpdate();
-//    for (i = 0; i < m.numEnemies; i++)
-//        EnemyUpdate(&enemies[i]);
+	EnemyUpdateAll();
 	renderScene();
 	glFlush();
 	glutPostRedisplay();
@@ -252,7 +221,8 @@ Key press event handler
 void onKeyDown(unsigned char key, int x, int y) {
 	//printf("%d \n", key);
 	PlayerHandleInput(key, true);
-    if (key == ' ') tentaCavar();
+	if (key == ' ') tentaCavar();
+
 	//glutPostRedisplay();
 }
 

@@ -47,7 +47,6 @@ void loadModel() {
 }
 
 void PlayerUpdate() {
-    //printf("Player Update\n");
     if (player.digging) {
         player.headPosAux += 34.0f;
 		if (player.headPosAux > 180.0f) {
@@ -55,50 +54,13 @@ void PlayerUpdate() {
 		}
 		player.diggingTime--;
 		if (player.diggingTime == 0) {
-            player.digging = 0;
+            player.digging = false;
             player.diggingTime = 10;
 		}
-    } else if (player.turningRight || player.turningLeft) {
-        if (player.turningRight) {
-            player.roty += 10;
-            if (player.roty % 90 == 0)
-                player.turningRight = false;
-        } else if (player.turningLeft) {
-            player.roty -= 10;
-            if (player.roty % 90 == 0)
-                player.turningLeft = false;
-        }
-
-        if (player.roty >= 360)
-            player.roty -= 360;
-        else if (player.roty < 0)
-            player.roty += 360;
-
-    } else if (player.goingForward || player.goingBackward) {
-
-        player.speedX = 0.05 * sin(player.roty*PI/180);
-		player.speedZ = -0.05 * cos(player.roty*PI/180);
-
-		// efeito de "sobe e desce" ao andar
-		player.headPosAux += 8.5f;
-		if (player.headPosAux > 180.0f) {
-			player.headPosAux = 0.0f;
-		}
-
-        float newX, newZ;
-        if (player.goingForward) {
-            newX = player.x + player.speedX;
-            newZ = player.z + player.speedZ;
-        } else {
-            newX = player.x - player.speedX;
-            newZ = player.z - player.speedZ;
-        }
-
-        if (!hasTypeAt(newX, newZ, 0.075, BLOCK)){
-            player.x = newX;
-            player.z = newZ;
-        }
-
+    } else if (player.turningRight ^ player.turningLeft) {
+        PlayerTurn();
+    } else if (player.goingForward ^ player.goingBackward) {
+        PlayerMove();
 	} else {
 		// parou de andar, para com o efeito de "sobe e desce"
 		player.headPosAux = fmod(player.headPosAux, 90) - 1 * player.headPosAux / 90;
@@ -107,6 +69,42 @@ void PlayerUpdate() {
 			player.headPosAux = 0.0f;
 		}
 	}
+	if (getTileXZ(player.x, player.z) == EMPTY)
+        PlayerFall();
+}
+
+void PlayerTurn(){
+    int direction = player.turningRight - player.turningLeft;
+    player.roty += 10*direction;
+    if (player.roty % 90 == 0){
+        player.turningRight = false;
+        player.turningLeft = false;
+    }
+    if (player.roty >= 360)
+        player.roty -= 360;
+    else if (player.roty < 0)
+        player.roty += 360;
+}
+
+void PlayerMove(){
+    int direction = player.goingForward - player.goingBackward;
+    player.speedX = 0.05 * sin(player.roty*PI/180);
+    player.speedZ = -0.05 * cos(player.roty*PI/180);
+    float newX = player.x + player.speedX*direction;
+    float newZ = player.z + player.speedZ*direction;
+    if (!hasTypeAt(newX, newZ, 0.075, BLOCK)){
+        player.x = newX;
+        player.z = newZ;
+    }
+    // efeito de "sobe e desce" ao andar
+    player.headPosAux += 8.5f;
+    if (player.headPosAux > 180.0f) {
+        player.headPosAux = 0.0f;
+    }
+}
+
+void PlayerFall(){
+    player.y -= 0.1;
 }
 
 void PlayerDraw() {
