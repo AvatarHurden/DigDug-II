@@ -153,7 +153,7 @@ void loadUpperFloor(char* name) {
 void newMap(char* lower_file_name, char* upper_file_name) {
 
     initTexture("../../res/normal_lateral.bmp", &m.chao_lateral);
-    initTexture("../../res/grass.bmp", &m.chao_topo);
+    initTexture("../../res/normal_topo.bmp", &m.chao_topo);
     initTexture("../../res/bloco_lateral.bmp", &m.bloco_lateral);
     initTexture("../../res/bloco_topo.bmp", &m.bloco_topo);
     initTexture("../../res/buraco.bmp", &m.buraco);
