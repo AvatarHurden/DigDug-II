@@ -43,7 +43,7 @@ void CameraUpdate() {
 
     } else if (camera.type == TOPDOWN) {
         eyeX = p.x;
-        eyeY = 10;
+        eyeY = 1;
         eyeZ = p.z;
 
         centerX = p.x;
@@ -63,7 +63,7 @@ void CameraChangeType() {
         break;
     case THIRDPERSON:
         camera.type = TOPDOWN;
-        glOrtho(-orthoWidth, orthoWidth, -orthoWidth, orthoWidth, 0.0f , 11.0f);
+        glOrtho(-orthoWidth, orthoWidth, -orthoWidth, orthoWidth, -1.0f , 2.0f);
         break;
     case TOPDOWN:
         camera.type = FIRSTPERSON;
