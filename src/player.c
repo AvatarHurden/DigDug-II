@@ -5,13 +5,13 @@
 void loadModel();
 
 Player player;
-float rotx = 0;
 float playerMoveSpeed = 0.05;
 float playerTurningSpeed = 10; //deve ser divisor de 90
 float playerRadius = 0.075;
 
 void newPlayer(){
     printf("New Player.\n");
+    player.isDead = false;
 
     player.x = 0.0f;
     player.y = 0.0f;
@@ -22,7 +22,7 @@ void newPlayer(){
     player.speedZ = 0.0f;
 
     player.roty = 0;
-    player.rotx = 90.0f;
+    player.rotx = 0;
 
     player.goingForward = false;
     player.goingBackward = false;
@@ -51,10 +51,15 @@ void loadModel() {
 }
 
 void PlayerUpdate() {
-    if (PlayerEnemyCollision()){
-        rotx = 90;
+    if (getTileXZ(player.x, player.z) == EMPTY)
+        PlayerFall();
+    if (player.isDead)
         return;
-    } else rotx = 0;
+    if (PlayerEnemyCollision()){
+        PlayerDie();
+        return;
+    }
+
     if (player.turningRight ^ player.turningLeft) {
         PlayerTurn();
     } else if (player.drilling) {
@@ -77,8 +82,7 @@ void PlayerUpdate() {
 			player.headPosAux = 0.0f;
 		}
 	}
-	if (getTileXZ(player.x, player.z) == EMPTY)
-        PlayerFall();
+
 }
 
 void PlayerTurn(){
@@ -112,7 +116,18 @@ void PlayerMove(){
 }
 
 void PlayerFall(){
-    player.y -= 0.1;
+    PlayerDie();
+    if (player.y == -0.5)
+        return;
+    else if (player.y < -0.5){
+        player.y = -0.5;
+        player.speedY = 0;
+    }
+    else{
+        player.speedY += gravity;
+        player.y -= player.speedY;
+    }
+
 }
 
 void PlayerDrill() {
@@ -158,6 +173,12 @@ void PlayerDrill() {
     eliminatePartitions();
 }
 
+void PlayerDie(){
+    player.roty = 0;
+    player.rotx = 90.0;
+    player.isDead = true;
+}
+
 bool PlayerEnemyCollision(){
     int i;
     Enemy e;
@@ -176,7 +197,8 @@ void PlayerDraw() {
         float eyeY = player.y + 0.119 + 0.025 * std::abs(sin(player.headPosAux*PI/180));
 
         glTranslatef(GLfloat(player.x), GLfloat(eyeY), GLfloat(player.z));
-        glRotatef(180 - player.roty, rotx, 1, 0);
+        glRotatef(player.rotx, 1, 0, 0);
+        glRotatef(180 - player.roty, 0, 1, 0);
         glmDraw(player.model, GLM_SMOOTH);
     glPopMatrix();
 }

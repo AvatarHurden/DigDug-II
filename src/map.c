@@ -11,9 +11,10 @@ Map* getMap(){ return &m; }
 Map cloneMap(){ return m; }
 int MapGetNumEnemies() { return m.numEnemies; }
 
+float gravity = 0.05;
 float blockSize = 0.4;
-char* lower_file_name = "../../res/lower2.bmp";
-char* upper_file_name = "../../res/upper2.bmp";
+char* lower_file_name = "../../res/lower.bmp";
+char* upper_file_name = "../../res/upper.bmp";
 
 void initTexture(char* name, GLuint* texture) {
     printf ("\nLoading texture..\n");

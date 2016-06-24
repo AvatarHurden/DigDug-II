@@ -15,6 +15,7 @@ typedef struct PLAYER{
     int drillingTime;
     bool turningLeft, turningRight, goingForward, goingBackward;
     float headPosAux;
+    bool isDead;
 } Player;
 
 
@@ -27,5 +28,6 @@ void PlayerMove();
 void PlayerFall();
 void PlayerDrill();
 bool PlayerEnemyCollision();
+void PlayerDie();
 
 #endif // PLAYER_H_INCLUDED

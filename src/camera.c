@@ -19,13 +19,26 @@ void CameraUpdate() {
     float eyeX, eyeY, eyeZ;
     float centerX, centerY, centerZ;
 
+    if (p.isDead){
+        eyeX = p.x;
+        eyeY = 2;
+        eyeZ = p.z;
+
+        centerX = p.x;
+        centerY = 0;
+        centerZ = p.z;
+
+        gluLookAt(eyeX,eyeY,eyeZ,centerX,centerY,centerZ,0.0,0.0,1.0);
+        return;
+    }
+
     if (camera.type == FIRSTPERSON) {
         eyeX = p.x - 0.01*sin(p.roty*PI/180);
         eyeY = p.y + posYOffset + 0.025 * std::abs(sin(p.headPosAux*PI/180));
         eyeZ = p.z + 0.01*cos(p.roty*PI/180);
 
         centerX = eyeX + sin(p.roty*PI/180);
-        centerY = eyeY + cos(p.rotx*PI/180);
+        centerY = eyeY;// + cos(p.rotx*PI/180);
         centerZ = eyeZ - cos(p.roty*PI/180);
 
         gluLookAt(eyeX,eyeY,eyeZ,centerX,centerY,centerZ,0.0,1.0,0.0);

@@ -31,7 +31,7 @@ Enemy newEnemy(int id){
     e.speedZ = 0.0f;
 
     e.roty = 0;
-    e.rotx = 90.0f;
+    e.rotx = 0;
 
     e.turningLeft = false;
     e.turningRight = false;
