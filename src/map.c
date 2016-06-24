@@ -12,6 +12,8 @@ Map cloneMap(){ return m; }
 int MapGetNumEnemies() { return m.numEnemies; }
 
 float blockSize = 0.4;
+char* lower_file_name = "../../res/lower2.bmp";
+char* upper_file_name = "../../res/upper2.bmp";
 
 void initTexture(char* name, GLuint* texture) {
     printf ("\nLoading texture..\n");
@@ -151,9 +153,6 @@ void loadUpperFloor(char* name) {
 }
 
 void newMap() {
-    char* lower_file_name = "../../res/lower.bmp";
-    char* upper_file_name = "../../res/upper.bmp";
-
     initTexture("../../res/normallateral.bmp", &m.chao_lateral);
     initTexture("../../res/normaltopo.bmp", &m.chao_topo);
     initTexture("../../res/blocolateral.bmp", &m.bloco_lateral);

@@ -6,6 +6,9 @@ void loadModel();
 
 Player player;
 float rotx = 0;
+float playerMoveSpeed = 0.05;
+float playerTurningSpeed = 10; //deve ser divisor de 90
+float playerRadius = 0.075;
 
 void newPlayer(){
     printf("New Player.\n");
@@ -80,7 +83,7 @@ void PlayerUpdate() {
 
 void PlayerTurn(){
     int direction = player.turningRight - player.turningLeft;
-    player.roty += 10*direction;
+    player.roty += playerTurningSpeed*direction;
     if (player.roty % 90 == 0){
         player.turningRight = false;
         player.turningLeft = false;
@@ -93,11 +96,11 @@ void PlayerTurn(){
 
 void PlayerMove(){
     int direction = player.goingForward - player.goingBackward;
-    player.speedX = 0.05 * sin(player.roty*PI/180);
-    player.speedZ = -0.05 * cos(player.roty*PI/180);
+    player.speedX = playerMoveSpeed * sin(player.roty*PI/180);
+    player.speedZ = -playerMoveSpeed * cos(player.roty*PI/180);
     float newX = player.x + player.speedX*direction;
     float newZ = player.z + player.speedZ*direction;
-    if (!hasTypeAt(newX, newZ, 0.075, BLOCK)){
+    if (!hasTypeAt(newX, newZ, playerRadius, BLOCK)){
         player.x = newX;
         player.z = newZ;
     }
@@ -158,12 +161,10 @@ void PlayerDrill() {
 bool PlayerEnemyCollision(){
     int i;
     Enemy e;
-    float r = 0.05;
     for (i=0; i<m.numEnemies; i++){
         e = enemies[i];
-        printf("%f, %f, %f, %f\n",player.x,e.x,player.z,e.z);
-        if (player.x-r < e.x+enemyRadius && player.x+r > e.x-enemyRadius &&
-            player.z-r < e.z+enemyRadius && player.z+r > e.z-enemyRadius)
+        if (player.x-playerRadius < e.x+enemyRadius && player.x+playerRadius > e.x-enemyRadius &&
+            player.z-playerRadius < e.z+enemyRadius && player.z+playerRadius > e.z-enemyRadius)
                 return true;
     }
     return false;
