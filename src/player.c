@@ -116,12 +116,10 @@ void PlayerMove(){
 }
 
 void PlayerFall(){
-    PlayerDie();
-    if (player.y == -0.5)
-        return;
-    else if (player.y < -0.5){
-        player.y = -0.5;
+    if (player.isDead) return;
+    if (player.y < -1){
         player.speedY = 0;
+        PlayerDie();
     }
     else{
         player.speedY += gravity;

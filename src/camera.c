@@ -20,15 +20,20 @@ void CameraUpdate() {
     float centerX, centerY, centerZ;
 
     if (p.isDead){
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
         eyeX = p.x;
-        eyeY = 2;
+        eyeY = 4;
         eyeZ = p.z;
 
         centerX = p.x;
         centerY = 0;
         centerZ = p.z;
 
+        gluPerspective(45.0f,camera.windowWidth/camera.windowHeight,0.1f, 100.0f);
         gluLookAt(eyeX,eyeY,eyeZ,centerX,centerY,centerZ,0.0,0.0,1.0);
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
         return;
     }
 
