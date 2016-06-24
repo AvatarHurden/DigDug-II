@@ -28,7 +28,7 @@ void EnemyTurn(Enemy* e);
 void EnemyMove(Enemy* e);
 void EnemyDecideAction(Enemy* e);
 Position getEnemyPosition(Enemy e);
-bool OtherEnemyAt(float x, float z, int id);
+bool EnemyEnemyCollision(float x, float z, int id);
 
 
 #endif // ENEMY_H_INCLUDED

@@ -87,13 +87,25 @@ void EnemyMove(Enemy* e){
     float newZ = e->z + e->speedZ;
     if (!hasTypeAt(newX, newZ, enemyRadius, BLOCK) &&
         !hasTypeAt(newX, newZ, enemyRadius, EMPTY) &&
-        !OtherEnemyAt(newX, newZ, e->id)){
+        !EnemyEnemyCollision(newX, newZ, e->id)){
             e->x = newX;
             e->z = newZ;
     } else {
         e->turningRight = true;
         e->lastTurnTime = time(NULL);
     }
+}
+
+bool EnemyEnemyCollision(float x, float z, int id){
+    int i;
+    Enemy e;
+    for (i=0; i<m.numEnemies; i++){
+        e = enemies[i];
+        if (x-enemyRadius < e.x+enemyRadius && x+enemyRadius > e.x-enemyRadius &&
+            z-enemyRadius < e.z+enemyRadius && e.z+enemyRadius > e.z-enemyRadius)
+                if (e.id != id) return true;
+    }
+    return false;
 }
 
 void EnemyDecideAction(Enemy* e){
@@ -122,17 +134,6 @@ void EnemyDraw(Enemy enemy) {
         glRotatef(enemy.roty, 0, 1, 0);
         glmDraw(enemy.model, GLM_SMOOTH);
     glPopMatrix();
-}
-
-bool OtherEnemyAt(float x, float z, int id){
-    int i;
-    for (i = 0; i < m.numEnemies; i++){
-        if (enemies[i].id == id) continue;
-        Position e = getEnemyPosition(enemies[i]);
-        if (abs(x - e.x) < 2*enemyRadius && abs(z - e.z) < 2*enemyRadius)
-            return true;
-    }
-    return false;
 }
 
 Position getEnemyPosition(Enemy e){
