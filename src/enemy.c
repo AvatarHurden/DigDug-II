@@ -8,6 +8,8 @@ void loadModel(Enemy* e);
 float enemyMoveSpeed = 0.05;
 float enemyTurnSpeed = 30; //Deve ser divisor de 90
 float enemyRadius = 0.1;
+float enemyShoveSpeed = 0.5;
+float enemyShoveDeceleration = -0.005;
 Enemy* enemies;
 
 void newEnemies(){
@@ -29,6 +31,8 @@ Enemy newEnemy(int id){
     e.speedX = 0.0f;
     e.speedY = 0.0f;
     e.speedZ = 0.0f;
+    e.shoveSpeedX = 0;
+    e.shoveSpeedZ = 0;
 
     e.roty = 0;
     e.rotx = 0;
@@ -63,11 +67,25 @@ void EnemyUpdate(Enemy* e) {
         return;
     }
     EnemyDecideAction(e);
+    if (e->shoveSpeedX != 0 || e->shoveSpeedZ != 0)
+        EnemyShove(e);
     if (e->turningRight ^ e->turningLeft) {
         EnemyTurn(e);
     } else {
         EnemyMove(e);
     }
+}
+
+void EnemyShove(Enemy* e) {
+    e->x += e->shoveSpeedX;
+    e->z += e->shoveSpeedZ;
+
+    e->shoveSpeedX += enemyShoveDeceleration;
+    if (e->shoveSpeedX < 0)
+        e->shoveSpeedX = 0;
+    e->shoveSpeedZ += enemyShoveDeceleration;
+    if (e->shoveSpeedZ < 0)
+        e->shoveSpeedZ = 0;
 }
 
 void EnemyTurn(Enemy* e){
@@ -127,6 +145,8 @@ bool EnemyEnemyCollision(float x, float z, int id){
 }
 
 void EnemyDecideAction(Enemy* e){
+    if (e->shoveSpeedX != 0 || e->shoveSpeedZ != 0)
+        return;
     if (time(NULL) - e->lastTurnTime > e->walkingTime) {
         e->lastTurnTime = time(NULL);
         if (rand() % 2 == 0)

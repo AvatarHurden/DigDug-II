@@ -15,6 +15,7 @@ typedef struct PLAYER{
     int drillingTime;
     bool turningLeft, turningRight, goingForward, goingBackward;
     float headPosAux;
+    unsigned long lastShoveTime;
     bool isDead;
 } Player;
 

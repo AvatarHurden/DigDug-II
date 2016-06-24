@@ -184,6 +184,7 @@ void onKeyDown(unsigned char key, int x, int y) {
 	PlayerHandleInput(key, true);
 	if (key == ' ') PlayerDrill();
 	if (key == 'r') newGame();
+    if (key == 'f') PlayerShoveEnemies();
 	CommandHandleInput(key);
 }
 

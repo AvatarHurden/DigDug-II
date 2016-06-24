@@ -15,6 +15,7 @@ typedef struct ENEMY {
     bool turningLeft, turningRight;
     unsigned long lastTurnTime;
     int walkingTime;
+    float shoveSpeedX, shoveSpeedZ;
 } Enemy;
 
 void newEnemies();
@@ -24,6 +25,7 @@ void EnemyUpdate(Enemy* e);
 void EnemyDrawAll();
 void EnemyDraw(Enemy e);
 void setEnemyPositions(Enemy* e);
+void EnemyShove(Enemy* e);
 void EnemyTurn(Enemy* e);
 void EnemyMove(Enemy* e);
 void EnemyDecideAction(Enemy* e);
