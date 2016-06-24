@@ -6,6 +6,7 @@
 void loadModel(Enemy* e);
 
 float enemyMoveSpeed = 0.05;
+float enemyTurnSpeed = 30; //Deve ser divisor de 90
 float enemyRadius = 0.1;
 Enemy* enemies;
 
@@ -67,7 +68,7 @@ void EnemyUpdate(Enemy* e) {
 
 void EnemyTurn(Enemy* e){
     int direction = e->turningRight - e->turningLeft;
-    e->roty += 10*direction;
+    e->roty += enemyTurnSpeed*direction;
     if (e->roty % 90 == 0){
         e->turningRight = false;
         e->turningLeft = false;
@@ -76,6 +77,7 @@ void EnemyTurn(Enemy* e){
         e->roty -= 360;
     else if (e->roty < 0)
         e->roty += 360;
+
 }
 
 void EnemyMove(Enemy* e){
