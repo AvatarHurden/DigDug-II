@@ -113,9 +113,9 @@ void mainInit() {
 
 	// habilita o z-buffer
 	glEnable(GL_DEPTH_TEST);
-	//	glEnable(GL_FOG);
-    //	glFogfv(GL_FOG_COLOR, backgrundColor);
-    //	glFogf(GL_FOG_DENSITY, 0.1);
+		glEnable(GL_FOG);
+    	glFogfv(GL_FOG_COLOR, backgrundColor);
+    	glFogf(GL_FOG_DENSITY, 0.1);
 	initLight();
 	newGame();
 }

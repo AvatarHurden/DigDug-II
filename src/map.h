@@ -10,7 +10,7 @@ typedef struct Map{
     int width;
     int numEnemies;
 
-    GLuint chao_lateral, chao_topo, bloco_lateral, bloco_topo;
+    GLuint agua, chao_lateral, chao_topo, bloco_lateral, bloco_topo;
     GLuint buraco, buraco_1_rachadura, buraco_2_rachaduras_paralelas;
     GLuint buraco_2_rachaduras_perpendiculares, buraco_3_rachaduras, buraco_4_rachaduras;
     GLuint rachadura, rachadura_cruzada;
