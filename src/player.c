@@ -151,6 +151,8 @@ void PlayerDrill() {
         start.x += xIncrement;
         start.z += zIncrement;
     }
+
+    findPartitions();
 }
 
 bool PlayerEnemyCollision(){
