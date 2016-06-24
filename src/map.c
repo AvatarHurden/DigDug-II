@@ -241,12 +241,8 @@ void MapDraw() {
 
     float planeSize = m.tileSize;
 
-	float textureScaleX = 10.0;
-	float textureScaleY = 10.0;
-    glColor4f(1.0f,1.0f,1.0f,1.0f);
     int xQuads = m.width;
     int zQuads = m.width;
-    int divider = 20;
     for (int i = 0; i < xQuads; i++) {
         for (int j = 0; j < zQuads; j++) {
             switch (getTile(i, j)) {
@@ -457,69 +453,64 @@ void drawWall(int i, int j, int level, int direction) {
     glEnd();
 }
 
-void floodFill2(int matrix[][20], int i, int j, int value) {
+int floodFill2(int* matrix, int i, int j, int value) {
 
-    if (matrix[i][j] == value)
-        return;
-    if (matrix[i][j] != 0)
-        return;
-    matrix[i][j] = value;
-//
-//    printf("\n");
-//    printf("\n");
-//     for (i = m.width-1; i >= 0; i--) {
-//        for (j = 0; j < m.width; j++)
-//            printf("%2d", matrix[i][j]);
-//        printf("\n");
-//     }
+    if (matrix[i + j * m.width] == value)
+        return 0;
+    if (matrix[i + j * m.width] != 0)
+        return 0;
+    matrix[i + j * m.width] = value;
 
-    floodFill2(matrix, i+1, j, value);
-    floodFill2(matrix, i, j+1, value);
-    floodFill2(matrix, i-1, j, value);
-    floodFill2(matrix, i, j-1, value);
+    int ret = 1;
+    ret += floodFill2(matrix, i+1, j, value);
+    ret += floodFill2(matrix, i, j+1, value);
+    ret += floodFill2(matrix, i-1, j, value);
+    ret += floodFill2(matrix, i, j-1, value);
+
+    return ret;
 }
 
 void findPartitions() {
 
-    int parts[m.width][20];
+    int parts[m.width*m.width];
     int i, j;
     for (i = 0; i < m.width; i++)
         for (j = 0; j < m.width; j++)
             if (getTile(i, j) == EMPTY)
-                parts[i][j] = -2;
+                parts[i + j * m.width] = -2;
             else if (getTile(i, j) == CRACK || getTile(i, j) == HOLE)
-                parts[i][j] = -1;
+                parts[i + j * m.width] = -1;
             else
-                parts[i][j] = 0;
+                parts[i + j * m.width] = 0;
 
-    bool isPartitionable = false;
+    int partitions = 0;
+    int maxSize = 0, maxSizePartition;
+    bool isPartitionable;
     int seedI, seedJ;
-    for (i = 0; i < m.width; i++)
-        for (j = 0; j < m.width; j++)
-            if (parts[i][j] == 0) {
-                isPartitionable = true;
-                seedI = i;
-                seedJ = j;
-            }
-
-    int partitions = 1;
-    while (isPartitionable) {
-        floodFill2(parts, seedI, seedJ, partitions);
-
+    do {
         isPartitionable = false;
         for (i = 0; i < m.width; i++)
             for (j = 0; j < m.width; j++)
-                if (parts[i][j] == 0) {
+                if (parts[i + j * m.width] == 0) {
                     isPartitionable = true;
                     seedI = i;
                     seedJ = j;
                 }
         partitions++;
-    }
+
+        int size = floodFill2(parts, seedI, seedJ, partitions);
+
+        if (size > maxSize) {
+            maxSize = size;
+            maxSizePartition = partitions;
+        }
+    } while (isPartitionable);
+
+    printf("\nMax partition is %d, with %d blocks\n", maxSizePartition, maxSize);
 
      for (i = m.width-1; i >= 0; i--) {
         for (j = 0; j < m.width; j++)
-            printf("%2d", parts[i][j]);
+            printf("%2d", parts[i + j * m.width]);
         printf("\n");
      }
 }
