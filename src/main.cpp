@@ -24,6 +24,7 @@ Arthur Vedana e Vitor Vanacor
 #include "enemy.c"
 #include "player.c"
 #include "camera.c"
+#include "command.c"
 
 #pragma comment(lib, "OpenAL32.lib")
 #pragma comment(lib, "alut.lib")
@@ -78,6 +79,7 @@ int mouseLastX = 0;
 int mouseLastY = 0;
 
 int i;                       /* Looping var */
+bool paused = false;
 
 float backgrundColor[4] = {0.529f,0.807f,0.980f,1.0f};
 
@@ -143,8 +145,10 @@ void renderScene() {
 Render scene
 */
 void mainRender() {
-	PlayerUpdate();
-	EnemyUpdateAll();
+    if (!paused){
+        PlayerUpdate();
+        EnemyUpdateAll();
+    }
 	renderScene();
 	glFlush();
 	glutPostRedisplay();
@@ -180,6 +184,7 @@ void onKeyDown(unsigned char key, int x, int y) {
 	PlayerHandleInput(key, true);
 	if (key == ' ') PlayerDrill();
 	if (key == 'r') newGame();
+	CommandHandleInput(key);
 }
 
 /**
@@ -187,7 +192,8 @@ Key release event handler
 */
 void onKeyUp(unsigned char key, int x, int y) {
     PlayerHandleInput(key, false);
-    if (key == 118) CameraChangeType(); //v
+    if (key == 'v') CameraChangeType();
+    if (key == 'p') if(paused) paused = false; else paused = true;
     if (key == 27) exit(0);
 }
 

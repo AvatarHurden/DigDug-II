@@ -58,6 +58,10 @@ void EnemyUpdateAll(){
 }
 
 void EnemyUpdate(Enemy* e) {
+    if (getTileXZ(e->x, e->z) == EMPTY){
+        EnemyFall(e);
+        return;
+    }
     EnemyDecideAction(e);
     if (e->turningRight ^ e->turningLeft) {
         EnemyTurn(e);
@@ -94,6 +98,20 @@ void EnemyMove(Enemy* e){
         e->turningRight = true;
         e->lastTurnTime = time(NULL);
     }
+}
+
+void EnemyFall(Enemy* e){
+    if (e->y == -1)
+        return;
+    else if (e->y < -1){
+        e->y = -1;
+        e->speedY = 0;
+    }
+    else{
+        e->speedY += gravity;
+        e->y -= e->speedY;
+    }
+
 }
 
 bool EnemyEnemyCollision(float x, float z, int id){

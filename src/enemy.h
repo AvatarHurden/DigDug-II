@@ -29,6 +29,7 @@ void EnemyMove(Enemy* e);
 void EnemyDecideAction(Enemy* e);
 Position getEnemyPosition(Enemy e);
 bool EnemyEnemyCollision(float x, float z, int id);
+void EnemyFall(Enemy* e);
 
 
 #endif // ENEMY_H_INCLUDED
