@@ -26,5 +26,6 @@ void PlayerTurn();
 void PlayerMove();
 void PlayerFall();
 void PlayerDrill();
+bool PlayerEnemyCollision();
 
 #endif // PLAYER_H_INCLUDED

@@ -5,6 +5,7 @@
 void loadModel();
 
 Player player;
+float rotx = 0;
 
 void newPlayer(){
     printf("New Player.\n");
@@ -47,6 +48,10 @@ void loadModel() {
 }
 
 void PlayerUpdate() {
+    if (PlayerEnemyCollision()){
+        rotx = 90;
+        return;
+    } else rotx = 0;
     if (player.turningRight ^ player.turningLeft) {
         PlayerTurn();
     } else if (player.drilling) {
@@ -148,13 +153,27 @@ void PlayerDrill() {
     }
 }
 
+bool PlayerEnemyCollision(){
+    int i;
+    Enemy e;
+    float r = 0.05;
+    for (i=0; i<m.numEnemies; i++){
+        e = enemies[i];
+        printf("%f, %f, %f, %f\n",player.x,e.x,player.z,e.z);
+        if (player.x-r < e.x+enemyRadius && player.x+r > e.x-enemyRadius &&
+            player.z-r < e.z+enemyRadius && player.z+r > e.z-enemyRadius)
+                return true;
+    }
+    return false;
+}
+
 void PlayerDraw() {
     glPushMatrix();
 
         float eyeY = player.y + 0.119 + 0.025 * std::abs(sin(player.headPosAux*PI/180));
 
         glTranslatef(GLfloat(player.x), GLfloat(eyeY), GLfloat(player.z));
-        glRotatef(180 - player.roty, 0, 1, 0);
+        glRotatef(180 - player.roty, rotx, 1, 0);
         glmDraw(player.model, GLM_SMOOTH);
     glPopMatrix();
 }
