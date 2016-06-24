@@ -219,6 +219,10 @@ Position getPositionXZ(float x, float z) {
     return p;
 }
 
+bool PositionEquals(Position p1, Position p2){
+    return (p1.x == p2.x && p1.z == p2.z);
+}
+
 bool hasTypeAt(float x, float z, float radius, TileType type) {
 
     return getTileXZ(x+radius, z+radius) == type ||

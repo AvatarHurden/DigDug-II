@@ -5,19 +5,22 @@
 
 void loadModel(Enemy* e);
 
+float enemyMoveSpeed = 0.05;
+float enemyRadius = 0.1;
 Enemy* enemies;
 
 void newEnemies(){
     enemies = (Enemy*) malloc(sizeof(Enemy)*MapGetNumEnemies());
     int i;
 	for (i = 0; i < MapGetNumEnemies(); i++)
-        enemies[i] = newEnemy();
+        enemies[i] = newEnemy(i);
     setEnemyPositions(enemies);
 }
 
-Enemy newEnemy(){
+Enemy newEnemy(int id){
     printf("New Enemy.\n");
     Enemy e;
+    e.id = id;
     e.x = 0.0f;
     e.y = 0.0f;
     e.z = 2.0f;
@@ -56,7 +59,6 @@ void EnemyUpdateAll(){
 void EnemyUpdate(Enemy* e) {
     EnemyDecideAction(e);
     if (e->turningRight ^ e->turningLeft) {
-        e->lastTurnTime = time(NULL);
         EnemyTurn(e);
     } else {
         EnemyMove(e);
@@ -77,26 +79,29 @@ void EnemyTurn(Enemy* e){
 }
 
 void EnemyMove(Enemy* e){
-    e->speedX = -0.025 * sin(e->roty*PI/180);
-    e->speedZ = -0.025 * cos(e->roty*PI/180);
+    e->speedX = -enemyMoveSpeed * sin(e->roty*PI/180);
+    e->speedZ = -enemyMoveSpeed * cos(e->roty*PI/180);
     float newX = e->x + e->speedX;
     float newZ = e->z + e->speedZ;
-    if (!hasTypeAt(newX, newZ, 0.075, BLOCK) &&
-        !hasTypeAt(newX, newZ, 0.075, EMPTY)){
-        e->x = newX;
-        e->z = newZ;
+    if (!hasTypeAt(newX, newZ, enemyRadius, BLOCK) &&
+        !hasTypeAt(newX, newZ, enemyRadius, EMPTY) &&
+        !OtherEnemyAt(newX, newZ, e->id)){
+            e->x = newX;
+            e->z = newZ;
     } else {
         e->turningRight = true;
+        e->lastTurnTime = time(NULL);
     }
 }
 
 void EnemyDecideAction(Enemy* e){
     if (time(NULL) - e->lastTurnTime > e->walkingTime) {
+        e->lastTurnTime = time(NULL);
         if (rand() % 2 == 0)
             e->turningLeft = true;
         else
             e->turningRight = true;
-        e->walkingTime = rand() % 3 + 1;
+        e->walkingTime = 99999; //rand() % 3 + 1;
     }
 }
 
@@ -115,6 +120,26 @@ void EnemyDraw(Enemy enemy) {
         glRotatef(enemy.roty, 0, 1, 0);
         glmDraw(enemy.model, GLM_SMOOTH);
     glPopMatrix();
+}
+
+bool OtherEnemyAt(float x, float z, int id){
+    int i;
+    for (i = 0; i < m.numEnemies; i++){
+        Position e = getEnemyPosition(enemies[i]);
+        if (x > e.x-enemyRadius && x < e.x+enemyRadius &&
+            z > e.z-enemyRadius && z < e.z+enemyRadius){
+                if (enemies[i].id != id)
+                    return true;
+        }
+    }
+    return false;
+}
+
+Position getEnemyPosition(Enemy e){
+    Position p;
+    p.x = e.x;
+    p.z = e.z;
+    return p;
 }
 
 void setEnemyPositions(Enemy* e) {
