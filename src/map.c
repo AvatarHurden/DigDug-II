@@ -470,7 +470,7 @@ int floodFill2(int* matrix, int i, int j, int value) {
     return ret;
 }
 
-void findPartitions() {
+void eliminatePartitions() {
 
     int parts[m.width*m.width];
     int i, j;
@@ -506,12 +506,9 @@ void findPartitions() {
         }
     } while (isPartitionable);
 
-    printf("\nMax partition is %d, with %d blocks\n", maxSizePartition, maxSize);
-
-     for (i = m.width-1; i >= 0; i--) {
+    for (i = m.width-1; i >= 0; i--)
         for (j = 0; j < m.width; j++)
-            printf("%2d", parts[i + j * m.width]);
-        printf("\n");
-     }
+            if (parts[i + j * m.width] > 0 && parts[i + j * m.width] != maxSizePartition)
+                setTile(i, j, EMPTY);
 }
 

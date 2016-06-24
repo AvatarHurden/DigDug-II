@@ -30,7 +30,7 @@ bool hasTypeAt(float x, float z, float radius, TileType type);
 void setTile(int i, int j, TileType tile);
 bool PositionEquals(Position p1, Position p2);
 
-void findPartitions();
+void eliminatePartitions();
 
 Position* getEnemyPositions();
 

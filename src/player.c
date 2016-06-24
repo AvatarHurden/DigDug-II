@@ -152,7 +152,7 @@ void PlayerDrill() {
         start.z += zIncrement;
     }
 
-    findPartitions();
+    eliminatePartitions();
 }
 
 bool PlayerEnemyCollision(){
