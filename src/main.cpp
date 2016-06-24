@@ -181,16 +181,17 @@ void tentaCavar() {
                 getPositionXZ(enemies[i].x, enemies[i].z).z == start.z) {
                 return;
             }
-    } while (getTile(start.x, start.z) != EMPTY);
+    } while (getTile(start.x, start.z) != EMPTY && getTile(start.x, start.z) != CRACK && getTile(start.x, start.z) != HOLE);
 
     start = getPositionXZ(player.x, player.z);
     start.x += xIncrement;
     start.z += zIncrement;
-    while (getTile(start.x, start.z) != EMPTY) {
+    while (getTile(start.x, start.z) != EMPTY && getTile(start.x, start.z) != CRACK && getTile(start.x, start.z) != HOLE) {
         setTile(start.x, start.z, CRACK);
         start.x += xIncrement;
         start.z += zIncrement;
     }
+    findPartitions();
 }
 
 /**

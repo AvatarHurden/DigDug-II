@@ -451,3 +451,70 @@ void drawWall(int i, int j, int level, int direction) {
     glEnd();
 }
 
+void floodFill2(int matrix[][20], int i, int j, int value) {
+
+    if (matrix[i][j] == value)
+        return;
+    if (matrix[i][j] != 0)
+        return;
+    matrix[i][j] = value;
+//
+//    printf("\n");
+//    printf("\n");
+//     for (i = m.width-1; i >= 0; i--) {
+//        for (j = 0; j < m.width; j++)
+//            printf("%2d", matrix[i][j]);
+//        printf("\n");
+//     }
+
+    floodFill2(matrix, i+1, j, value);
+    floodFill2(matrix, i, j+1, value);
+    floodFill2(matrix, i-1, j, value);
+    floodFill2(matrix, i, j-1, value);
+}
+
+void findPartitions() {
+
+    int parts[m.width][20];
+    int i, j;
+    for (i = 0; i < m.width; i++)
+        for (j = 0; j < m.width; j++)
+            if (getTile(i, j) == EMPTY)
+                parts[i][j] = -2;
+            else if (getTile(i, j) == CRACK || getTile(i, j) == HOLE)
+                parts[i][j] = -1;
+            else
+                parts[i][j] = 0;
+
+    bool isPartitionable = false;
+    int seedI, seedJ;
+    for (i = 0; i < m.width; i++)
+        for (j = 0; j < m.width; j++)
+            if (parts[i][j] == 0) {
+                isPartitionable = true;
+                seedI = i;
+                seedJ = j;
+            }
+
+    int partitions = 1;
+    while (isPartitionable) {
+        floodFill2(parts, seedI, seedJ, partitions);
+
+        isPartitionable = false;
+        for (i = 0; i < m.width; i++)
+            for (j = 0; j < m.width; j++)
+                if (parts[i][j] == 0) {
+                    isPartitionable = true;
+                    seedI = i;
+                    seedJ = j;
+                }
+        partitions++;
+    }
+
+     for (i = m.width-1; i >= 0; i--) {
+        for (j = 0; j < m.width; j++)
+            printf("%2d", parts[i][j]);
+        printf("\n");
+     }
+}
+
