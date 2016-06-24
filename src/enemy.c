@@ -125,12 +125,10 @@ void EnemyDraw(Enemy enemy) {
 bool OtherEnemyAt(float x, float z, int id){
     int i;
     for (i = 0; i < m.numEnemies; i++){
+        if (enemies[i].id == id) continue;
         Position e = getEnemyPosition(enemies[i]);
-        if (x > e.x-enemyRadius && x < e.x+enemyRadius &&
-            z > e.z-enemyRadius && z < e.z+enemyRadius){
-                if (enemies[i].id != id)
-                    return true;
-        }
+        if (abs(x - e.x) < 2*enemyRadius && abs(z - e.z) < 2*enemyRadius)
+            return true;
     }
     return false;
 }

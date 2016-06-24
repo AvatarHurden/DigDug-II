@@ -151,51 +151,6 @@ void mainRender() {
 	Sleep(30);
 }
 
-void tentaCavar() {
-    if (player.digging)
-        return;
-
-    player.digging = true;
-
-    if (getTileXZ(player.x, player.z) != HOLE)
-        return;
-
-    int dir = player.roty / 90;
-
-    int zIncrement = 0, xIncrement = 0;
-    if (dir == 0)
-        zIncrement = -1;
-    else if (dir == 1)
-        xIncrement = 1;
-    else if (dir == 2)
-        zIncrement = 1;
-    else
-        xIncrement = -1;
-
-    Position start = getPositionXZ(player.x, player.z);
-    do {
-        start.x += xIncrement;
-        start.z += zIncrement;
-        if (getTile(start.x, start.z) == BLOCK)
-            return;
-        for (i = 0; i < m.numEnemies; i++)
-            if (getPositionXZ(enemies[i].x, enemies[i].z).x == start.x &&
-                getPositionXZ(enemies[i].x, enemies[i].z).z == start.z) {
-                return;
-            }
-    } while (getTile(start.x, start.z) != EMPTY && getTile(start.x, start.z) != CRACK && getTile(start.x, start.z) != HOLE);
-
-    start = getPositionXZ(player.x, player.z);
-    start.x += xIncrement;
-    start.z += zIncrement;
-    while (getTile(start.x, start.z) != EMPTY && getTile(start.x, start.z) != CRACK && getTile(start.x, start.z) != HOLE) {
-        setTile(start.x, start.z, CRACK);
-        start.x += xIncrement;
-        start.z += zIncrement;
-    }
-    findPartitions();
-}
-
 /**
 Handles events from the mouse right button menu
 */
