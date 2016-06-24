@@ -3,6 +3,7 @@
 
 typedef struct ENEMY {
     GLMmodel *model;
+    int id;
     float x;
     float y;
     float z;
@@ -17,7 +18,7 @@ typedef struct ENEMY {
 } Enemy;
 
 void newEnemies();
-Enemy newEnemy();
+Enemy newEnemy(int id);
 void EnemyUpdateAll();
 void EnemyUpdate(Enemy* e);
 void EnemyDrawAll();
@@ -26,6 +27,8 @@ void setEnemyPositions(Enemy* e);
 void EnemyTurn(Enemy* e);
 void EnemyMove(Enemy* e);
 void EnemyDecideAction(Enemy* e);
+Position getEnemyPosition(Enemy e);
+bool OtherEnemyAt(float x, float z, int id);
 
 
 #endif // ENEMY_H_INCLUDED

@@ -150,7 +150,9 @@ void loadUpperFloor(char* name) {
     }
 }
 
-void newMap(char* lower_file_name, char* upper_file_name) {
+void newMap() {
+    char* lower_file_name = "../../res/lower.bmp";
+    char* upper_file_name = "../../res/upper.bmp";
 
     initTexture("../../res/normallateral.bmp", &m.chao_lateral);
     initTexture("../../res/normaltopo.bmp", &m.chao_topo);
@@ -215,6 +217,10 @@ Position getPositionXZ(float x, float z) {
     p.x = (int)(x/m.tileSize);
     p.z = (int)(z/m.tileSize);
     return p;
+}
+
+bool PositionEquals(Position p1, Position p2){
+    return (p1.x == p2.x && p1.z == p2.z);
 }
 
 bool hasTypeAt(float x, float z, float radius, TileType type) {
