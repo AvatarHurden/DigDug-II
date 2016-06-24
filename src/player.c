@@ -130,6 +130,73 @@ void PlayerFall(){
 
 }
 
+void PlayerShoveEnemies() {
+    if (time(NULL) - player.lastShoveTime < 2)
+        return;
+
+    player.lastShoveTime = time(NULL);
+
+    int dir = player.roty / 90;
+    float startX, startZ, endX, endZ;
+
+    float blastWidth = 0.1, blastDepth = 3;
+    switch (dir) {
+    case 0:
+        startX = player.x - blastWidth/2;
+        endX = player.x + blastWidth/2;
+        startZ = player.z;
+        endZ = player.z - blastDepth;
+        break;
+    case 1:
+        startX = player.x;
+        endX = player.x + blastDepth;
+        startZ = player.z - blastWidth/2;
+        endZ = player.z + blastWidth/2;
+        break;
+    case 2:
+        startX = player.x - blastWidth/2;
+        endX = player.x + blastWidth/2;
+        startZ = player.z;
+        endZ = player.z + blastDepth;
+        break;
+    case 3:
+        startX = player.x;
+        endX = player.x - blastDepth;
+        startZ = player.z - blastWidth/2;
+        endZ = player.z + blastWidth/2;
+        break;
+    }
+
+    if (startX > endX) {
+        float temp = endX;
+        endX = startX;
+        startX = temp;
+    }
+    if (startZ > endZ) {
+        float temp = endZ;
+        endZ = startZ;
+        startZ = temp;
+    }
+
+    int i;
+    for (i = 0; i < m.numEnemies; i++)
+        if (enemies[i].x > startX && enemies[i].x < endX &&
+            enemies[i].z > startZ && enemies[i].z < endZ) {
+
+            enemies[i].shoveSpeedZ = 0;
+            enemies[i].shoveSpeedX = 0;
+            if (dir == 0)
+                enemies[i].shoveSpeedZ = - enemyShoveSpeed;
+            else if (dir == 1)
+                enemies[i].shoveSpeedX = enemyShoveSpeed;
+            else if (dir == 2)
+                enemies[i].shoveSpeedZ = enemyShoveSpeed;
+            else if (dir == 3)
+                enemies[i].shoveSpeedX = - enemyShoveSpeed;
+        }
+
+}
+
 void PlayerDrill() {
     if (player.drilling)
         return;
