@@ -8,89 +8,118 @@ void newCamera(int width, int height){
     printf("New Camera.\n");
     camera.windowWidth = width;
     camera.windowHeight = height;
-    camera.type = TOPDOWN; //Vai ser alterado para FIRSTPERSON pela ChangeType
-    CameraChangeType();
+    CameraSetType(FIRSTPERSON);
 }
-void CameraUpdate() {
-    //printf("update Camera\n");
-    float posYOffset = 0.2;
-    Player p = clonePlayer();
-
-    float eyeX, eyeY, eyeZ;
-    float centerX, centerY, centerZ;
-
-    if (p.isDead){
+void CameraUpdate(bool isMiniMap) {
+    if (isMiniMap){
+        cameraType t = camera.type;
+        CameraSetType(TOPDOWN);
+        camera.eyeX = 5;
+        camera.eyeY = 1;
+        camera.eyeZ = 5;
+        camera.centerX = 5;
+        camera.centerY = 0;
+        camera.centerZ = 5;
+        gluLookAt(camera.eyeX,camera.eyeY,camera.eyeZ,camera.centerX,camera.centerY,camera.centerZ,0.0,0.0,1.0);
+        camera.type = t;
+        return;
+    }
+    if (player.isDead){
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        eyeX = p.x;
-        eyeY = 4;
-        eyeZ = p.z;
-
-        centerX = p.x;
-        centerY = 0;
-        centerZ = p.z;
+        camera.eyeX = player.x;
+        camera.eyeY = 4;
+        camera.eyeZ = player.z;
+        camera.centerX = player.x;
+        camera.centerY = 0;
+        camera.centerZ = player.z;
 
         gluPerspective(45.0f,camera.windowWidth/camera.windowHeight,0.1f, 100.0f);
-        gluLookAt(eyeX,eyeY,eyeZ,centerX,centerY,centerZ,0.0,0.0,1.0);
+        gluLookAt(camera.eyeX,camera.eyeY,camera.eyeZ,camera.centerX,camera.centerY,camera.centerZ,0.0,0.0,1.0);
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
         return;
     }
-
     if (camera.type == FIRSTPERSON) {
-        eyeX = p.x - 0.01*sin(p.roty*PI/180);
-        eyeY = p.y + posYOffset + 0.025 * std::abs(sin(p.headPosAux*PI/180));
-        eyeZ = p.z + 0.01*cos(p.roty*PI/180);
-
-        centerX = eyeX + sin(p.roty*PI/180);
-        centerY = eyeY;// + cos(p.rotx*PI/180);
-        centerZ = eyeZ - cos(p.roty*PI/180);
-
-        gluLookAt(eyeX,eyeY,eyeZ,centerX,centerY,centerZ,0.0,1.0,0.0);
-
+        CameraAtPlayer();
+        CameraLookAtHorizon();
+        gluLookAt(camera.eyeX,camera.eyeY,camera.eyeZ,camera.centerX,camera.centerY,camera.centerZ,0.0,1.0,0.0);
     } else if (camera.type == THIRDPERSON) {
-        eyeX = p.x - 0.5*sin(p.roty*PI/180);
-        eyeY = p.y + posYOffset + 0.2 + 0.025 * std::abs(sin(p.headPosAux*PI/180));
-        eyeZ = p.z + 0.5*cos(p.roty*PI/180);
-
-        centerX = p.x;
-        centerY = p.y + posYOffset + 0.1 + 0.025 * std::abs(sin(p.headPosAux*PI/180));
-        centerZ = p.z;
-
-        gluLookAt(eyeX,eyeY,eyeZ,centerX,centerY,centerZ,0.0,1.0,0.0);
-
+        CameraBehindPlayer();
+        CameraLookInFront();
+        gluLookAt(camera.eyeX,camera.eyeY,camera.eyeZ,camera.centerX,camera.centerY,camera.centerZ,0.0,1.0,0.0);
     } else if (camera.type == TOPDOWN) {
-        eyeX = p.x;
-        eyeY = 1;
-        eyeZ = p.z;
-
-        centerX = p.x;
-        centerY = 0;
-        centerZ = p.z;
-
-        gluLookAt(eyeX,eyeY,eyeZ,centerX,centerY,centerZ,0.0,0.0,1.0);
+        CameraAbovePlayer();
+        CameraLookAtPlayer();
+        gluLookAt(camera.eyeX,camera.eyeY,camera.eyeZ,camera.centerX,camera.centerY,camera.centerZ,0.0,0.0,1.0);
     }
 }
-void CameraChangeType() {
+
+void CameraSetType(cameraType type){
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    switch (camera.type){
+    switch(type){
     case FIRSTPERSON:
-        camera.type = THIRDPERSON;
         gluPerspective(45.0f,camera.windowWidth/camera.windowHeight,0.1f, 100.0f);
         break;
     case THIRDPERSON:
-        camera.type = TOPDOWN;
-        glOrtho(-orthoWidth, orthoWidth, -orthoWidth, orthoWidth, -1.0f , 2.0f);
-        break;
-    case TOPDOWN:
-        camera.type = FIRSTPERSON;
         gluPerspective(45.0f,camera.windowWidth/camera.windowHeight,0.1f, 100.0f);
         break;
+    case TOPDOWN:
+        glOrtho(-orthoWidth, orthoWidth, -orthoWidth, orthoWidth, -1.0f , 2.0f);
+        break;
     }
+    camera.type = type;
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 }
+
+void CameraChangeType() {
+    switch (camera.type){
+    case FIRSTPERSON:
+        CameraSetType(THIRDPERSON);
+        break;
+    case THIRDPERSON:
+        CameraSetType(TOPDOWN);
+        break;
+    case TOPDOWN:
+        CameraSetType(FIRSTPERSON);
+        break;
+    }
+
+}
+
+void CameraAtPlayer(){
+    camera.eyeX = player.x - 0.01*sin(player.roty*PI/180);
+    camera.eyeY = player.y + 0.2 + 0.025 * std::abs(sin(player.headPosAux*PI/180));
+    camera.eyeZ = player.z + 0.01*cos(player.roty*PI/180);
+}
+void CameraLookAtHorizon(){
+    camera.centerX = camera.eyeX + sin(player.roty*PI/180);
+    camera.centerY = camera.eyeY;// + cos(player.rotx*PI/180);
+    camera.centerZ = camera.eyeZ - cos(player.roty*PI/180);
+}
+void CameraBehindPlayer(){
+    camera.eyeX = player.x - 0.5*sin(player.roty*PI/180);
+    camera.eyeY = player.y + 0.4 + 0.025 * std::abs(sin(player.headPosAux*PI/180));
+    camera.eyeZ = player.z + 0.5*cos(player.roty*PI/180);
+}
+void CameraLookInFront(){
+    camera.centerX = player.x;
+    camera.centerY = player.y + 0.3 + 0.025 * std::abs(sin(player.headPosAux*PI/180));
+    camera.centerZ = player.z;
+}
+void CameraAbovePlayer(){
+    camera.eyeX = player.x;
+    camera.eyeY = 1;
+    camera.eyeZ = player.z;
+}
+void CameraLookAtPlayer(){
+    camera.centerX = player.x;
+    camera.centerY = player.y;
+    camera.centerZ = player.z;
+}
+
 void CameraResize(int w, int h){
     camera.windowWidth = w;
     camera.windowHeight = h;

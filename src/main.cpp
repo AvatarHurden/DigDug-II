@@ -72,6 +72,7 @@ int windowXPos = 100;
 int windowYPos = 150;
 
 int mainWindowId = 0;
+int subWindowId = 0;
 
 double xOffset = -1.9;
 double yOffset = -1.3;
@@ -127,17 +128,15 @@ void newGame(){
     newCamera(windowWidth, windowHeight);
 }
 
-void renderScene() {
+void renderScene(bool isMiniMap) {
 	glClearColor(backgrundColor[0],backgrundColor[1],backgrundColor[2],backgrundColor[3]);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);  // limpar o depth buffer
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-
-	CameraUpdate();
+	CameraUpdate(isMiniMap);
     PlayerDraw();
     EnemyDrawAll();
-
 	MapDraw();
 }
 
@@ -145,14 +144,22 @@ void renderScene() {
 Render scene
 */
 void mainRender() {
+    glutSetWindow(mainWindowId);
     if (!paused){
         PlayerUpdate();
         EnemyUpdateAll();
     }
-	renderScene();
+	renderScene(false);
 	glFlush();
 	glutPostRedisplay();
 	Sleep(30);
+}
+
+void miniMapRender(){
+    glutSetWindow(subWindowId);
+    renderScene(true);
+    glFlush();
+    glutPostRedisplay();
 }
 
 /**
@@ -182,9 +189,7 @@ Key press event handler
 */
 void onKeyDown(unsigned char key, int x, int y) {
 	PlayerHandleInput(key, true);
-	if (key == ' ') PlayerDrill();
 	if (key == 'r') newGame();
-    if (key == 'f') PlayerShoveEnemies();
 	CommandHandleInput(key);
 }
 
@@ -202,6 +207,7 @@ void onWindowReshape(int x, int y) {
 	windowWidth = x;
 	windowHeight = y;
 	newCamera(windowWidth, windowHeight);
+	//CameraResize(windowWidth, windowHeight);
 	setViewport(0, windowWidth, 0, windowHeight);
 }
 
@@ -215,14 +221,16 @@ int main(int argc, char **argv) {
 	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGBA | GLUT_DEPTH);
 	glutInitWindowSize(windowWidth,windowHeight);
 	glutInitWindowPosition(windowXPos,windowYPos);
-	mainWindowId = glutCreateWindow("FPS");
-
-	glutDisplayFunc(mainRender);
+	mainWindowId = glutCreateWindow("Dig Dug II");
+    glutDisplayFunc(mainRender);
 	glutReshapeFunc(onWindowReshape);
 	glutKeyboardFunc(onKeyDown);
 	glutKeyboardUpFunc(onKeyUp);
-
 	mainInit();
+	subWindowId = glutCreateSubWindow(mainWindowId, 0, 0,windowWidth/3, windowHeight/3);
+    glutDisplayFunc(miniMapRender);
+    mainInit();
+
 	glutMainLoop();
 
     return 0;

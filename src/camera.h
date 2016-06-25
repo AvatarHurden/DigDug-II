@@ -9,11 +9,21 @@ typedef struct CAMERA{
     cameraType type;
     int windowWidth;
     int windowHeight;
+    float eyeX, eyeY, eyeZ;
+    float centerX, centerY, centerZ;
 } Camera;
 
 void newCamera(int width, int height);
-void CameraUpdate();
+void CameraSetType(cameraType type);
+void CameraUpdate(cameraType isMiniMap);
 void CameraChangeType();
 void CameraResize(int w, int h);
+void CameraSetType(cameraType type);
+void CameraAtPlayer();
+void CameraLookAtHorizon();
+void CameraBehindPlayer();
+void CameraLookInFront();
+void CameraAbovePlayer();
+void CameraLookAtPlayer();
 
 #endif // CAMERA_H_INCLUDED

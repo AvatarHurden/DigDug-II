@@ -284,6 +284,12 @@ void PlayerHandleInput(unsigned char key, bool pressed){
 		    if (pressed && !player.turningLeft)
                 player.turningRight = true;
 			break;
+        case ' ':
+            PlayerDrill();
+            break;
+        case 'f':
+            PlayerShoveEnemies();
+            break;
 		default:
 			break;
 	}
