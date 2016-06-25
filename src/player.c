@@ -42,7 +42,7 @@ Player* getPlayer(){ return &player; }
 
 void loadModel() {
 
-    player.model = glmReadOBJ("../../res/goblin_obj.obj");
+    player.model = glmReadOBJ("../../res/duke.obj");
 
     glmUnitize(player.model);
     glmScale(player.model,0.12); // USED TO SCALE THE OBJECT

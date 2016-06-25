@@ -14,12 +14,12 @@ void CameraUpdate(bool isMiniMap) {
     if (isMiniMap){
         cameraType t = camera.type;
         CameraSetType(TOPDOWN);
-        camera.eyeX = 5;
+        camera.eyeX = 4;
         camera.eyeY = 1;
-        camera.eyeZ = 5;
-        camera.centerX = 5;
+        camera.eyeZ = 4;
+        camera.centerX = 4;
         camera.centerY = 0;
-        camera.centerZ = 5;
+        camera.centerZ = 4;
         gluLookAt(camera.eyeX,camera.eyeY,camera.eyeZ,camera.centerX,camera.centerY,camera.centerZ,0.0,0.0,1.0);
         camera.type = t;
         return;

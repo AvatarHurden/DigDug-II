@@ -241,13 +241,13 @@ void MapDraw() {
 	glPushMatrix();
 
     float planeSize = m.tileSize;
-    
-    for (int i = -100; i < 100; i++)
-        for (int j = -100; j < 100; j++) {
+
+    for (int i = -30; i < 30; i++)
+        for (int j = -30; j < 30; j++) {
             glBindTexture(GL_TEXTURE_2D, m.agua);
             drawBlock(i, j, -1, 0);
         }
-       
+
     int xQuads = m.width;
     int zQuads = m.width;
     for (int i = 0; i < xQuads; i++) {
