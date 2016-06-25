@@ -35,7 +35,7 @@ float enemyMoveSpeed = 0.05;
 float enemyTurnSpeed = 30; //Deve ser divisor de 90
 float enemyRadius = 0.1;
 float enemyShoveSpeed = 0.5;
-float enemyShoveDeceleration = -0.005;
+float enemyShoveDeceleration = 0.005;
 Enemy* enemies;
 
 void newEnemies(){
@@ -106,12 +106,25 @@ void EnemyShove(Enemy* e) {
     e->x += e->shoveSpeedX;
     e->z += e->shoveSpeedZ;
 
-    e->shoveSpeedX += enemyShoveDeceleration;
-    if (e->shoveSpeedX < 0)
-        e->shoveSpeedX = 0;
-    e->shoveSpeedZ += enemyShoveDeceleration;
-    if (e->shoveSpeedZ < 0)
-        e->shoveSpeedZ = 0;
+    if (e->shoveSpeedX > 0) {
+        e->shoveSpeedX -= enemyShoveDeceleration;
+        if (e->shoveSpeedX < 0)
+            e->shoveSpeedX = 0;
+    } else if (e->shoveSpeedX < 0) {
+        e->shoveSpeedX += enemyShoveDeceleration;
+        if (e->shoveSpeedX > 0)
+            e->shoveSpeedX = 0;
+    }
+
+    if (e->shoveSpeedZ > 0) {
+        e->shoveSpeedZ -= enemyShoveDeceleration;
+        if (e->shoveSpeedZ < 0)
+            e->shoveSpeedZ = 0;
+    } else if (e->shoveSpeedZ < 0) {
+        e->shoveSpeedZ += enemyShoveDeceleration;
+        if (e->shoveSpeedZ > 0)
+            e->shoveSpeedZ = 0;
+    }
 }
 
 void EnemyTurn(Enemy* e){
@@ -164,7 +177,8 @@ bool EnemyEnemyCollision(float x, float z, int id){
     for (i=0; i<m.numEnemies; i++){
         e = enemies[i];
         if (x-enemyRadius < e.x+enemyRadius && x+enemyRadius > e.x-enemyRadius &&
-            z-enemyRadius < e.z+enemyRadius && e.z+enemyRadius > e.z-enemyRadius)
+            z-enemyRadius < e.z+enemyRadius && e.z+enemyRadius > e.z-enemyRadius
+            && e.y > -1)
                 if (e.id != id) return true;
     }
     return false;
