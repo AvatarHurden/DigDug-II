@@ -154,6 +154,7 @@ void loadUpperFloor(char* name) {
 }
 
 void newMap() {
+    initTexture("../../res/agua.bmp", &m.agua);
     initTexture("../../res/normallateral.bmp", &m.chao_lateral);
     initTexture("../../res/normaltopo.bmp", &m.chao_topo);
     initTexture("../../res/blocolateral.bmp", &m.bloco_lateral);
@@ -240,7 +241,13 @@ void MapDraw() {
 	glPushMatrix();
 
     float planeSize = m.tileSize;
-
+    
+    for (int i = -100; i < 100; i++)
+        for (int j = -100; j < 100; j++) {
+            glBindTexture(GL_TEXTURE_2D, m.agua);
+            drawBlock(i, j, -1, 0);
+        }
+       
     int xQuads = m.width;
     int zQuads = m.width;
     for (int i = 0; i < xQuads; i++) {
