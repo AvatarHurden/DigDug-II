@@ -1,7 +1,28 @@
-#include "player.h"
+typedef struct PLAYER{
+    GLMmodel *model;
+    float x, y, z;
+    float speedX, speedY, speedZ;
+    float rotx, rotz;
+    int roty;
+    bool drilling;
+    int drillingTime;
+    bool turningLeft, turningRight, goingForward, goingBackward;
+    float headPosAux;
+    unsigned long lastShoveTime;
+    bool isDead;
+} Player;
 
-#define PI 3.14159265
-
+void newPlayer();
+void PlayerUpdate();
+void PlayerDraw();
+void setPlayerPosition();
+void PlayerTurn();
+void PlayerMove();
+void PlayerUpAndDown(float spd);
+void PlayerFall();
+void PlayerDrill();
+bool PlayerEnemyCollision();
+void PlayerDie();
 void loadModel();
 
 Player player;
@@ -15,7 +36,7 @@ void newPlayer(){
 
     player.x = 0.0f;
     player.y = 0.0f;
-    player.z = 2.0f;
+    player.z = 0.0f;
 
     player.speedX = 0.0f;
     player.speedY = 0.0f;
@@ -23,22 +44,20 @@ void newPlayer(){
 
     player.roty = 0;
     player.rotx = 0;
+    player.rotz = 0;
+    player.headPosAux = 0.0f;
 
     player.goingForward = false;
     player.goingBackward = false;
     player.turningLeft = false;
     player.turningRight = false;
     player.drilling = false;
-    player.drillingTime = 10;
-    player.headPosAux = 0.0f;
+    player.drillingTime = 15;
 
     setPlayerPosition();
     loadModel();
 
 }
-
-Player clonePlayer(){ return player; }
-Player* getPlayer(){ return &player; }
 
 void loadModel() {
 
@@ -59,23 +78,13 @@ void PlayerUpdate() {
         PlayerDie();
         return;
     }
-
-    if (player.turningRight ^ player.turningLeft) {
+    if (player.drilling) {
+        PlayerDrill();
+    }else if (player.turningRight ^ player.turningLeft) {
         PlayerTurn();
-    } else if (player.drilling) {
-        player.headPosAux += 90.0f;
-		if (player.headPosAux > 180.0f) {
-			player.headPosAux = 0.0f;
-		}
-		player.drillingTime--;
-		if (player.drillingTime == 0) {
-            player.drilling = false;
-            player.drillingTime = 10;
-		}
-    } else if (player.goingForward ^ player.goingBackward) {
+    }else if (player.goingForward ^ player.goingBackward) {
         PlayerMove();
 	} else {
-		// parou de andar, para com o efeito de "sobe e desce"
 		player.headPosAux = fmod(player.headPosAux, 90) - 1 * player.headPosAux / 90;
 		player.headPosAux -= 4.0f;
 		if (player.headPosAux < 0.0f) {
@@ -109,7 +118,11 @@ void PlayerMove(){
         player.z = newZ;
     }
     // efeito de "sobe e desce" ao andar
-    player.headPosAux += 8.5f;
+    PlayerUpAndDown(8.5);
+}
+
+void PlayerUpAndDown(float spd){
+    player.headPosAux += spd;
     if (player.headPosAux > 180.0f) {
         player.headPosAux = 0.0f;
     }
@@ -196,9 +209,16 @@ void PlayerShoveEnemies() {
 }
 
 void PlayerDrill() {
-    if (player.drilling)
+    PlayerUpAndDown(90);
+    player.drillingTime--;
+    if (player.drillingTime == 0) {
+        player.drilling = false;
+        player.drillingTime = 15;
         return;
-    player.drilling = true;
+    }
+    if (player.drillingTime < 14)
+        return;
+    PlaySound(TEXT("../../res/jackhammer.wav"), NULL, SND_ASYNC|SND_FILENAME);
     if (getTileXZ(player.x, player.z) != HOLE)
         return;
     int dir = player.roty / 90;
@@ -261,7 +281,7 @@ void PlayerDraw() {
 
         float eyeY = player.y + 0.119 + 0.025 * std::abs(sin(player.headPosAux*PI/180));
 
-        glTranslatef(GLfloat(player.x), GLfloat(eyeY), GLfloat(player.z));
+        glTranslatef(player.x, eyeY, player.z);
         glRotatef(player.rotx, 1, 0, 0);
         glRotatef(180 - player.roty, 0, 1, 0);
         glmDraw(player.model, GLM_SMOOTH);
@@ -285,7 +305,7 @@ void PlayerHandleInput(unsigned char key, bool pressed){
                 player.turningRight = true;
 			break;
         case ' ':
-            PlayerDrill();
+            if (!player.turningLeft && !player.turningRight) player.drilling = true;
             break;
         case 'f':
             PlayerShoveEnemies();

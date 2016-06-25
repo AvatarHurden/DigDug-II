@@ -2,11 +2,13 @@
 Trabalho Final FCG
 Arthur Vedana e Vitor Vanacor
 */
-
-#include <windows.h>
+#define PI 3.14159265
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <windows.h>
+#include <Mmsystem.h>
+#include <time.h>
 #include <math.h>
 #include <cmath>
 #include <iostream>
@@ -14,41 +16,21 @@ Arthur Vedana e Vitor Vanacor
 #include <gl/glut.h>
 
 #include "glm.h"
-
-//openal (sound lib)
-#include <al/alut.h>
-
-//bitmap class to load bitmaps for textures
 #include "bitmap.h"
 #include "map.c"
 #include "enemy.c"
 #include "player.c"
 #include "camera.c"
-#include "command.c"
 
-#pragma comment(lib, "OpenAL32.lib")
-#pragma comment(lib, "alut.lib")
 
-#define PI 3.14159265
-
-// sound stuff
-#define NUM_BUFFERS 1
-#define NUM_SOURCES 1
-#define NUM_ENVIRONMENTS 1
-
-#define SMOOTH 0
-#define SMOOTH_MATERIAL 1
-#define SMOOTH_MATERIAL_TEXTURE 2
 
 void mainInit();
 void initTexture();
 void initLight();
-void createGLUI();
 void mainRender();
 void mainCreateMenu();
 void onKeyDown(unsigned char key, int x, int y);
 void onKeyUp(unsigned char key, int x, int y);
-void onGLUIEvent(int id);
 void onWindowReshape(int x, int y);
 void mainIdle();
 int main(int argc, char **argv);
@@ -108,20 +90,18 @@ void setViewport(GLint left, GLint right, GLint bottom, GLint top) {
 Initialize
 */
 void mainInit() {
-	glClearColor(1.0,1.0,1.0,0.0);
-	glColor3f(0.0f,0.0f,0.0f);
-	setViewport(0, windowWidth, 0, windowHeight);
-
-	// habilita o z-buffer
-	glEnable(GL_DEPTH_TEST);
-		glEnable(GL_FOG);
-    	glFogfv(GL_FOG_COLOR, backgrundColor);
-    	glFogf(GL_FOG_DENSITY, 0.1);
-	initLight();
 	newGame();
 }
 
 void newGame(){
+    glClearColor(1.0,1.0,1.0,0.0);
+	glColor3f(0.0f,0.0f,0.0f);
+	setViewport(0, windowWidth, 0, windowHeight);
+	glEnable(GL_DEPTH_TEST);
+    glEnable(GL_FOG);
+    glFogfv(GL_FOG_COLOR, backgrundColor);
+    glFogf(GL_FOG_DENSITY, 0.1);
+	initLight();
     newMap();
     newPlayer();
     newEnemies();
@@ -144,7 +124,6 @@ void renderScene(bool isMiniMap) {
 Render scene
 */
 void mainRender() {
-    glutSetWindow(mainWindowId);
     if (!paused){
         PlayerUpdate();
         EnemyUpdateAll();
@@ -190,7 +169,6 @@ Key press event handler
 void onKeyDown(unsigned char key, int x, int y) {
 	PlayerHandleInput(key, true);
 	if (key == 'r') newGame();
-	CommandHandleInput(key);
 }
 
 /**
@@ -206,8 +184,7 @@ void onKeyUp(unsigned char key, int x, int y) {
 void onWindowReshape(int x, int y) {
 	windowWidth = x;
 	windowHeight = y;
-	newCamera(windowWidth, windowHeight);
-	//CameraResize(windowWidth, windowHeight);
+	CameraResize(windowWidth, windowHeight);
 	setViewport(0, windowWidth, 0, windowHeight);
 }
 
@@ -224,6 +201,7 @@ int main(int argc, char **argv) {
 	mainWindowId = glutCreateWindow("Dig Dug II");
     glutDisplayFunc(mainRender);
 	glutReshapeFunc(onWindowReshape);
+	glutIdleFunc(mainIdle);
 	glutKeyboardFunc(onKeyDown);
 	glutKeyboardUpFunc(onKeyUp);
 	mainInit();

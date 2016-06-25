@@ -1,7 +1,29 @@
-#include "camera.h"
+typedef enum {FIRSTPERSON, THIRDPERSON, TOPDOWN} cameraType;
+typedef enum {PERSPECTIVE, ORTHOGONAL} projectionType;
+
+typedef struct CAMERA{
+    Player* player;
+    cameraType type;
+    int windowWidth;
+    int windowHeight;
+    float eyeX, eyeY, eyeZ;
+    float centerX, centerY, centerZ;
+} Camera;
+
+void newCamera(int width, int height);
+void CameraSetType(cameraType type);
+void CameraUpdate(cameraType isMiniMap);
+void CameraChangeType();
+void CameraResize(int w, int h);
+void CameraSetType(cameraType type);
+void CameraAtPlayer();
+void CameraLookAtHorizon();
+void CameraBehindPlayer();
+void CameraLookInFront();
+void CameraAbovePlayer();
+void CameraLookAtPlayer();
 
 Camera camera;
-
 float orthoWidth = 7.0/2;
 
 void newCamera(int width, int height){
@@ -86,7 +108,6 @@ void CameraChangeType() {
         CameraSetType(FIRSTPERSON);
         break;
     }
-
 }
 
 void CameraAtPlayer(){
@@ -123,4 +144,5 @@ void CameraLookAtPlayer(){
 void CameraResize(int w, int h){
     camera.windowWidth = w;
     camera.windowHeight = h;
+    CameraSetType(camera.type);
 }

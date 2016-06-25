@@ -1,4 +1,31 @@
-#include "map.h"
+typedef enum {EMPTY, NORMAL, BLOCK, HOLE, CRACK, ENEMY, PLAYER} TileType;
+
+typedef struct Map{
+    TileType* tiles;
+    float tileSize;
+    int width;
+    int numEnemies;
+
+    GLuint agua, chao_lateral, chao_topo, bloco_lateral, bloco_topo;
+    GLuint buraco, buraco_1_rachadura, buraco_2_rachaduras_paralelas;
+    GLuint buraco_2_rachaduras_perpendiculares, buraco_3_rachaduras, buraco_4_rachaduras;
+    GLuint rachadura, rachadura_cruzada;
+} Map;
+
+typedef struct POSITION {
+    int x, z;
+} Position;
+
+void newMap();
+void MapDraw();
+
+TileType getTile(int i, int j);
+TileType getTileXZ(float x, float z);
+Position getPositionXZ(float x, float z);
+bool hasTypeAt(float x, float z, float radius, TileType type);
+void setTile(int i, int j, TileType tile);
+bool PositionEquals(Position p1, Position p2);
+void eliminatePartitions();
 
 void drawBlock(int i, int j, int height, int rotation);
 void drawHole(int i, int j);
