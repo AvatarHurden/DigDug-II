@@ -22,8 +22,6 @@ Arthur Vedana e Vitor Vanacor
 #include "player.c"
 #include "camera.c"
 
-
-
 void mainInit();
 void initTexture();
 void initLight();
@@ -40,28 +38,20 @@ void updateState();
 void renderFloor();
 void updateCam();
 void newGame();
+void displayText( float x, float y, int r, int g, int b, const char *string );
 
-/**
-Screen dimensions
-*/
-int windowWidth = 600;
-int windowHeight = 480;
+int windowWidth = 900;
+int windowHeight = 900;
 
-/**
-Screen position
-*/
-int windowXPos = 100;
-int windowYPos = 150;
+int windowXPos = 150;
+int windowYPos = 100;
+double xOffset = -1.9;
+double yOffset = -1.3;
 
 int mainWindowId = 0;
 int subWindowId = 0;
 
-double xOffset = -1.9;
-double yOffset = -1.3;
-int mouseLastX = 0;
-int mouseLastY = 0;
-
-int i;                       /* Looping var */
+int i;
 bool paused = false;
 
 float backgrundColor[4] = {0.529f,0.807f,0.980f,1.0f};
@@ -73,13 +63,12 @@ void initLight() {
 	GLfloat light_ambient[] = { backgrundColor[0], backgrundColor[1], backgrundColor[2], backgrundColor[3] };
 	GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
 	GLfloat light_specular[] = { 1.0, 1.0, 1.0, 1.0 };
-	GLfloat light_position0[] = {4.0, 4.0, 3.0, 1.0 };
-	GLfloat light_position1[] = {0.0, 0.0, 0.0, 1.0 };
+	GLfloat light_position[] = {4.0, 4.0, 3.0, 1.0 };
 
 	glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
 	glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
-	glLightfv(GL_LIGHT0, GL_POSITION, light_position0);
+	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
 }
 
 void setViewport(GLint left, GLint right, GLint bottom, GLint top) {
@@ -98,9 +87,10 @@ void newGame(){
 	glColor3f(0.0f,0.0f,0.0f);
 	setViewport(0, windowWidth, 0, windowHeight);
 	glEnable(GL_DEPTH_TEST);
-    glEnable(GL_FOG);
+    //glEnable(GL_FOG);
+    glHint(GL_FOG_HINT, GL_NICEST);
     glFogfv(GL_FOG_COLOR, backgrundColor);
-    glFogf(GL_FOG_DENSITY, 0.1);
+    glFogf(GL_FOG_DENSITY, 0.05);
 	initLight();
     newMap();
     newPlayer();
@@ -126,7 +116,7 @@ Render scene
 void mainRender() {
     if (!paused){
         PlayerUpdate();
-        EnemyUpdateAll();
+        EnemyUpdateAll(getPositionXZ(player.x, player.z));
     }
 	renderScene(false);
 	glFlush();
