@@ -1,4 +1,5 @@
 typedef enum {EMPTY, NORMAL, BLOCK, HOLE, CRACK, ENEMY, PLAYER} TileType;
+typedef enum {N=90, E=0, S=270, W=180} ORIENTATION;
 
 typedef struct Map{
     TileType* tiles;
@@ -181,19 +182,19 @@ void loadUpperFloor(char* name) {
 }
 
 void newMap() {
-    initTexture("../../res/agua.bmp", &m.agua);
-    initTexture("../../res/normallateral.bmp", &m.chao_lateral);
-    initTexture("../../res/normaltopo.bmp", &m.chao_topo);
-    initTexture("../../res/blocolateral.bmp", &m.bloco_lateral);
-    initTexture("../../res/blocotopo.bmp", &m.bloco_topo);
-    initTexture("../../res/buraco.bmp", &m.buraco);
-    initTexture("../../res/buraco1rachadura.bmp", &m.buraco_1_rachadura);
-    initTexture("../../res/buraco2rachadurasparalelas.bmp", &m.buraco_2_rachaduras_paralelas);
-    initTexture("../../res/buraco2rachadurasperpendiculares.bmp", &m.buraco_2_rachaduras_perpendiculares);
-    initTexture("../../res/buraco3rachaduras.bmp", &m.buraco_3_rachaduras);
-    initTexture("../../res/buraco4rachaduras.bmp", &m.buraco_4_rachaduras);
-    initTexture("../../res/rachadura.bmp", &m.rachadura);
-    initTexture("../../res/rachaduracruzada.bmp", &m.rachadura_cruzada);
+    initTexture("../../res/map/agua.bmp", &m.agua);
+    initTexture("../../res/map/normallateral.bmp", &m.chao_lateral);
+    initTexture("../../res/map/normaltopo.bmp", &m.chao_topo);
+    initTexture("../../res/map/blocolateral.bmp", &m.bloco_lateral);
+    initTexture("../../res/map/blocotopo.bmp", &m.bloco_topo);
+    initTexture("../../res/map/buraco.bmp", &m.buraco);
+    initTexture("../../res/map/buraco1rachadura.bmp", &m.buraco_1_rachadura);
+    initTexture("../../res/map/buraco2rachadurasparalelas.bmp", &m.buraco_2_rachaduras_paralelas);
+    initTexture("../../res/map/buraco2rachadurasperpendiculares.bmp", &m.buraco_2_rachaduras_perpendiculares);
+    initTexture("../../res/map/buraco3rachaduras.bmp", &m.buraco_3_rachaduras);
+    initTexture("../../res/map/buraco4rachaduras.bmp", &m.buraco_4_rachaduras);
+    initTexture("../../res/map/rachadura.bmp", &m.rachadura);
+    initTexture("../../res/map/rachaduracruzada.bmp", &m.rachadura_cruzada);
     m.tileSize = 0.4;
     m.numEnemies = 0;
 
@@ -260,7 +261,6 @@ bool hasTypeAt(float x, float z, float radius, TileType type) {
 }
 
 void MapDraw() {
-
 	glShadeModel(GL_SMOOTH);
 	glEnable(GL_TEXTURE_2D);
     glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
@@ -545,4 +545,3 @@ void eliminatePartitions() {
             if (parts[i + j * m.width] > 0 && parts[i + j * m.width] != maxSizePartition)
                 setTile(i, j, EMPTY);
 }
-
