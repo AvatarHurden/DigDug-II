@@ -78,6 +78,10 @@ void PlayerUpdate() {
         PlayerDie();
         return;
     }
+    if (aliveEnemies == 0) {
+        player.isDead = true;
+        return;
+    }
     if (player.drilling) {
         PlayerDrill();
     }else if (player.turningRight ^ player.turningLeft) {
