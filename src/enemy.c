@@ -38,7 +38,7 @@ double sinD(float radAngle);
 double cosD(float radAngle);
 
 float enemyMoveSpeed = 0.025;
-float enemyTurnSpeed = 45; //Deve ser divisor de 90
+float enemyTurnSpeed = 30; //Deve ser divisor de 90
 float enemyRadius = 0.1;
 float enemyShoveSpeed = 0.1;
 float enemyShoveDeceleration = 0.01;
@@ -85,7 +85,7 @@ void loadModel(Enemy* e) {
     e->model = glmReadOBJ("../../res/models/enemy.obj");
 
     glmUnitize(e->model);
-    glmScale(e->model,0.12); // USED TO SCALE THE OBJECT
+    glmScale(e->model,0.14); // USED TO SCALE THE OBJECT
     glmFacetNormals(e->model);
     glmVertexNormals(e->model, 90.0);
 }

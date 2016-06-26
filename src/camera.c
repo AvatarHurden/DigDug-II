@@ -42,7 +42,7 @@ void CameraUpdate(bool isMiniMap) {
         camera.centerX = 4;
         camera.centerY = 0;
         camera.centerZ = 4;
-        gluLookAt(camera.eyeX,camera.eyeY,camera.eyeZ,camera.centerX,camera.centerY,camera.centerZ,0.0,0.0,1.0);
+        gluLookAt(camera.eyeX,camera.eyeY,camera.eyeZ,camera.centerX,camera.centerY,camera.centerZ,0.0,0.0,-1.0);
         camera.type = t;
         return;
     }
@@ -111,14 +111,14 @@ void CameraChangeType() {
 }
 
 void CameraAtPlayer(){
-    camera.eyeX = player.x + 0.01*cosD(player.roty);
+    camera.eyeX = player.x - 0.01*cosD(player.roty);
     camera.eyeY = player.y + 0.2 + 0.025 * std::abs(sinD(player.headPosAux));
-    camera.eyeZ = player.z - 0.01*sinD(player.roty);
+    camera.eyeZ = player.z + 0.01*sinD(player.roty);
 }
 void CameraLookAtHorizon(){
-    camera.centerX = camera.eyeX;
-    camera.centerY = camera.eyeY;// + cos(player.rotx*PI/180);
-    camera.centerZ = camera.eyeZ;
+    camera.centerX = camera.eyeX + cosD(player.roty);
+    camera.centerY = camera.eyeY;
+    camera.centerZ = camera.eyeZ - sinD(player.roty);
 }
 void CameraBehindPlayer(){
     camera.eyeX = player.x - 0.5*cosD(player.roty);

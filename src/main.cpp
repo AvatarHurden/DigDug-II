@@ -63,7 +63,7 @@ void initLight() {
 	GLfloat light_ambient[] = { backgrundColor[0], backgrundColor[1], backgrundColor[2], backgrundColor[3] };
 	GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
 	GLfloat light_specular[] = { 1.0, 1.0, 1.0, 1.0 };
-	GLfloat light_position[] = {4.0, 4.0, 3.0, 1.0 };
+	GLfloat light_position[] = {4.0, 10.0, 4.0, 1.0 };
 
 	glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
@@ -79,6 +79,7 @@ void setViewport(GLint left, GLint right, GLint bottom, GLint top) {
 Initialize
 */
 void mainInit() {
+    initLight();
 	newGame();
 }
 
@@ -91,7 +92,6 @@ void newGame(){
     glHint(GL_FOG_HINT, GL_NICEST);
     glFogfv(GL_FOG_COLOR, backgrundColor);
     glFogf(GL_FOG_DENSITY, 0.05);
-	initLight();
     newMap();
     newPlayer();
     newEnemies();

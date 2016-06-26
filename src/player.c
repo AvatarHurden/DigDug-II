@@ -27,7 +27,7 @@ void loadModel();
 
 Player player;
 float playerMoveSpeed = 0.05;
-float playerTurningSpeed = 45; //deve ser divisor de 90
+float playerTurningSpeed = 30; //deve ser divisor de 90
 float playerRadius = 0.075;
 
 void newPlayer(){
@@ -64,7 +64,7 @@ void loadModel() {
     player.model = glmReadOBJ("../../res/models/ED-209.obj");
 
     glmUnitize(player.model);
-    glmScale(player.model,0.1); // USED TO SCALE THE OBJECT
+    glmScale(player.model,0.14); // USED TO SCALE THE OBJECT
     glmFacetNormals(player.model);
     glmVertexNormals(player.model, 90.0);
 }
