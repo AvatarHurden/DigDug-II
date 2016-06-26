@@ -566,6 +566,12 @@ void eliminatePartitions() {
                     shouldEliminateBlock(parts, i  , j+1, maxSizePartition) ||
                     shouldEliminateBlock(parts, i+1, j+1, maxSizePartition)))
                 setTile(i, j, EMPTY);
+            else if (parts[i + j * m.width] == -1 && (
+                    shouldEliminateBlock(parts, i-1, j  , maxSizePartition) ||
+                    shouldEliminateBlock(parts, i  , j-1, maxSizePartition) ||
+                    shouldEliminateBlock(parts, i+1, j  , maxSizePartition) ||
+                    shouldEliminateBlock(parts, i  , j+1, maxSizePartition))
+                setTile(i, j, EMPTY);
             else if (shouldEliminateBlock(parts, i-1, j-1, maxSizePartition) &&
                     shouldEliminateBlock(parts, i  , j-1, maxSizePartition) &&
                     shouldEliminateBlock(parts, i+1, j-1, maxSizePartition) &&
