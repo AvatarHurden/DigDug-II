@@ -260,7 +260,36 @@ bool hasTypeAt(float x, float z, float radius, TileType type) {
         getTileXZ(x+radius, z-radius) == type;
 }
 
+void updateMap() {
+
+    int i, j;
+    for (i = 0; i < m.width; i++)
+        for (j = 0; j < m.width; j++) {
+            switch(getTile(i, j)) {
+            case CRACK:
+                if (((getTile(i+1, j) == EMPTY) +
+                    (getTile(i-1, j) == EMPTY) +
+                    (getTile(i, j+1) == EMPTY) +
+                    (getTile(i, j-1) == EMPTY)) >= 2)
+                    setTile(i, j, EMPTY);
+                break;
+            case HOLE:
+                if (getTile(i+1, j) == EMPTY &&
+                    getTile(i-1, j) == EMPTY &&
+                    getTile(i, j+1) == EMPTY &&
+                    getTile(i, j-1) == EMPTY)
+                    setTile(i, j, EMPTY);
+                break;
+            default:
+                break;
+            }
+        }
+}
+
 void MapDraw() {
+
+    updateMap();
+
 	glShadeModel(GL_SMOOTH);
 	glEnable(GL_TEXTURE_2D);
     glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
@@ -556,39 +585,8 @@ void eliminatePartitions() {
     if (partitions == 1)
         return;
 
-    for (i = m.width-1; i >= 0; i--)
+    for (i = 0; i < m.width; i++)
         for (j = 0; j < m.width; j++)
             if (shouldEliminateBlock(parts, i, j, maxSizePartition))
-                setTile(i, j, EMPTY);
-            else if (parts[i + j * m.width] == -2 && (
-                    shouldEliminateBlock(parts, i-1, j-1, maxSizePartition) ||
-                    shouldEliminateBlock(parts, i  , j-1, maxSizePartition) ||
-                    shouldEliminateBlock(parts, i+1, j-1, maxSizePartition) ||
-                    shouldEliminateBlock(parts, i-1, j  , maxSizePartition) ||
-                    shouldEliminateBlock(parts, i+1, j  , maxSizePartition) ||
-                    shouldEliminateBlock(parts, i-1, j+1, maxSizePartition) ||
-                    shouldEliminateBlock(parts, i  , j+1, maxSizePartition) ||
-                    shouldEliminateBlock(parts, i+1, j+1, maxSizePartition)))
-                setTile(i, j, EMPTY);
-            else if (parts[i + j * m.width] == -2 && (
-                    willBeEmpty(parts, i-1, j  , maxSizePartition) +
-                    willBeEmpty(parts, i+1, j  , maxSizePartition) +
-                    willBeEmpty(parts, i  , j-1, maxSizePartition) +
-                    willBeEmpty(parts, i  , j+1, maxSizePartition) > 2))
-                setTile(i, j, EMPTY);
-            else if (parts[i + j * m.width] == -1 && (
-                    shouldEliminateBlock(parts, i-1, j  , maxSizePartition) &&
-                    shouldEliminateBlock(parts, i  , j-1, maxSizePartition) &&
-                    shouldEliminateBlock(parts, i+1, j  , maxSizePartition) &&
-                    shouldEliminateBlock(parts, i  , j+1, maxSizePartition)))
-                setTile(i, j, EMPTY);
-            else if (shouldEliminateBlock(parts, i-1, j-1, maxSizePartition) &&
-                    shouldEliminateBlock(parts, i  , j-1, maxSizePartition) &&
-                    shouldEliminateBlock(parts, i+1, j-1, maxSizePartition) &&
-                    shouldEliminateBlock(parts, i-1, j  , maxSizePartition) &&
-                    shouldEliminateBlock(parts, i+1, j  , maxSizePartition) &&
-                    shouldEliminateBlock(parts, i-1, j+1, maxSizePartition) &&
-                    shouldEliminateBlock(parts, i  , j+1, maxSizePartition) &&
-                    shouldEliminateBlock(parts, i+1, j+1, maxSizePartition))
                 setTile(i, j, EMPTY);
 }
