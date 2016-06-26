@@ -39,7 +39,7 @@ double cosD(float radAngle);
 
 float enemyMoveSpeed = 0.025;
 float enemyTurnSpeed = 30; //Deve ser divisor de 90
-float enemyRadius = 0.1;
+float enemyRadius = 0.15;
 float enemyShoveSpeed = 0.1;
 float enemyShoveDeceleration = 0.01;
 int aliveEnemies = 0;
@@ -85,7 +85,7 @@ void loadModel(Enemy* e) {
     e->model = glmReadOBJ("../../res/models/enemy.obj");
 
     glmUnitize(e->model);
-    glmScale(e->model,0.14); // USED TO SCALE THE OBJECT
+    glmScale(e->model,0.17); // USED TO SCALE THE OBJECT
     glmFacetNormals(e->model);
     glmVertexNormals(e->model, 90.0);
 }
@@ -112,8 +112,15 @@ void EnemyUpdate(Enemy* e, Position pPos) {
 }
 
 void EnemyShove(Enemy* e) {
-    e->x += e->shoveSpeedX;
-    e->z += e->shoveSpeedZ;
+    float newX = e->x + e->shoveSpeedX;
+    float newZ = e->z + e->shoveSpeedZ;
+    if (EnemyCanMoveTo(newX, newZ, e->id) || hasTypeAt(newX, newZ, enemyRadius, EMPTY)){
+        e->x = newX;
+        e->z = newZ;
+    } else{
+        e->shoveSpeedX = 0;
+        e->shoveSpeedZ = 0;
+    }
 
     if (e->shoveSpeedX > 0) {
         e->shoveSpeedX -= enemyShoveDeceleration;
@@ -204,19 +211,22 @@ bool EnemyEnemyCollision(float x, float z, int id){
 
 void EnemyDecideAction(Enemy* e, Position pPos){
     Position ePos = getPositionXZ(e->x, e->z);
-    if (abs(pPos.x - ePos.x) <= 4 || abs(pPos.z - ePos.z) <= 4){ //Se está dentro do raio de visao
+    if (abs(pPos.x - ePos.x) <= 3 && abs(pPos.z - ePos.z) <= 3){ //Se está dentro do raio de visao
         EnemyChasePlayer(e, pPos);
     }
-    else if (time(NULL) - e->lastTurnTime > e->walkingTime) {
-        printf("VIRADA ALEATORIA\n");
-        EnemyTurnRandom(e);
-        e->lastTurnTime = time(NULL);
-        e->walkingTime = rand() % 3 + 1;
+    else {
+        printf("DEBOA\n");
+        if (time(NULL) - e->lastTurnTime > e->walkingTime) {
+            printf("VIRADA ALEATORIA\n");
+            EnemyTurnRandom(e);
+            e->lastTurnTime = time(NULL);
+            e->walkingTime = rand() % 3 + 1;
+        }
     }
 }
 
 void EnemyChasePlayer(Enemy* e, Position pPos){
-    //printf("PPERSEGUINDO\n");
+    printf("PPERSEGUINDO\n");
     Position ePos = getPositionXZ(e->x, e->z);
     if(abs(pPos.x-ePos.x)>abs(pPos.z-ePos.z)){ //Se a distancia X for maior
         if (pPos.x>ePos.x){ //Se o x do jogador é maior

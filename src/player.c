@@ -28,7 +28,7 @@ void loadModel();
 Player player;
 float playerMoveSpeed = 0.05;
 float playerTurningSpeed = 30; //deve ser divisor de 90
-float playerRadius = 0.075;
+float playerRadius = 0.15;
 
 void newPlayer(){
     printf("New Player.\n");
@@ -64,7 +64,7 @@ void loadModel() {
     player.model = glmReadOBJ("../../res/models/ED-209.obj");
 
     glmUnitize(player.model);
-    glmScale(player.model,0.14); // USED TO SCALE THE OBJECT
+    glmScale(player.model,0.17); // USED TO SCALE THE OBJECT
     glmFacetNormals(player.model);
     glmVertexNormals(player.model, 90.0);
 }
@@ -98,7 +98,6 @@ void PlayerTurn(){
     int direction = player.turningLeft - player.turningRight;
     player.roty += playerTurningSpeed*direction;
     if (player.roty % 90 == 0){
-        printf("ANG:%d\n",player.roty);
         player.turningRight = false;
         player.turningLeft = false;
     }
@@ -109,7 +108,6 @@ void PlayerTurn(){
 }
 
 void PlayerMove(){
-    printf("POS x:%f z:%f\n",player.x,player.z);
     int direction = player.goingForward - player.goingBackward;
     player.speedX = playerMoveSpeed*direction * cosD(player.roty);
     player.speedZ = -playerMoveSpeed*direction * sinD(player.roty);
@@ -151,7 +149,7 @@ void PlayerShoveEnemies() {
     PlaySound(TEXT("../../res/sounds/shotgun.wav"), NULL, SND_ASYNC|SND_FILENAME);
     float startX, startZ, endX, endZ;
 
-    float blastWidth = 0.3, blastDepth = 3;
+    float blastWidth = 0.3, blastDepth = 1;
     switch (player.roty) {
     case S:
         startX = player.x - blastWidth/2;
