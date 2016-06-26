@@ -73,7 +73,7 @@ void CameraUpdate(bool isMiniMap) {
     } else if (camera.type == TOPDOWN) {
         CameraAbovePlayer();
         CameraLookAtPlayer();
-        gluLookAt(camera.eyeX,camera.eyeY,camera.eyeZ,camera.centerX,camera.centerY,camera.centerZ,0.0,0.0,1.0);
+        gluLookAt(camera.eyeX,camera.eyeY,camera.eyeZ,camera.centerX,camera.centerY,camera.centerZ,0.0,0.0,-1.0);
     }
 }
 
@@ -111,23 +111,23 @@ void CameraChangeType() {
 }
 
 void CameraAtPlayer(){
-    camera.eyeX = player.x - 0.01*sin(player.roty*PI/180);
-    camera.eyeY = player.y + 0.2 + 0.025 * std::abs(sin(player.headPosAux*PI/180));
-    camera.eyeZ = player.z + 0.01*cos(player.roty*PI/180);
+    camera.eyeX = player.x + 0.01*cosD(player.roty);
+    camera.eyeY = player.y + 0.2 + 0.025 * std::abs(sinD(player.headPosAux));
+    camera.eyeZ = player.z - 0.01*sinD(player.roty);
 }
 void CameraLookAtHorizon(){
-    camera.centerX = camera.eyeX + sin(player.roty*PI/180);
+    camera.centerX = camera.eyeX;
     camera.centerY = camera.eyeY;// + cos(player.rotx*PI/180);
-    camera.centerZ = camera.eyeZ - cos(player.roty*PI/180);
+    camera.centerZ = camera.eyeZ;
 }
 void CameraBehindPlayer(){
-    camera.eyeX = player.x - 0.5*sin(player.roty*PI/180);
-    camera.eyeY = player.y + 0.4 + 0.025 * std::abs(sin(player.headPosAux*PI/180));
-    camera.eyeZ = player.z + 0.5*cos(player.roty*PI/180);
+    camera.eyeX = player.x - 0.5*cosD(player.roty);
+    camera.eyeY = player.y + 0.4 + 0.025 * std::abs(sinD(player.headPosAux));
+    camera.eyeZ = player.z + 0.5*sinD(player.roty);
 }
 void CameraLookInFront(){
     camera.centerX = player.x;
-    camera.centerY = player.y + 0.3 + 0.025 * std::abs(sin(player.headPosAux*PI/180));
+    camera.centerY = player.y + 0.3 + 0.025 * std::abs(sinD(player.headPosAux));
     camera.centerZ = player.z;
 }
 void CameraAbovePlayer(){
