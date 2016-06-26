@@ -27,7 +27,7 @@ void loadModel();
 
 Player player;
 float playerMoveSpeed = 0.05;
-float playerTurningSpeed = 10; //deve ser divisor de 90
+float playerTurningSpeed = 45; //deve ser divisor de 90
 float playerRadius = 0.075;
 
 void newPlayer(){
@@ -42,7 +42,7 @@ void newPlayer(){
     player.speedY = 0.0f;
     player.speedZ = 0.0f;
 
-    player.roty = 0;
+    player.roty = 90;
     player.rotx = 0;
     player.rotz = 0;
     player.headPosAux = 0.0f;
@@ -61,10 +61,10 @@ void newPlayer(){
 
 void loadModel() {
 
-    player.model = glmReadOBJ("../../res/duke.obj");
+    player.model = glmReadOBJ("../../res/models/ED-209.obj");
 
     glmUnitize(player.model);
-    glmScale(player.model,0.12); // USED TO SCALE THE OBJECT
+    glmScale(player.model,0.1); // USED TO SCALE THE OBJECT
     glmFacetNormals(player.model);
     glmVertexNormals(player.model, 90.0);
 }
@@ -95,9 +95,10 @@ void PlayerUpdate() {
 }
 
 void PlayerTurn(){
-    int direction = player.turningRight - player.turningLeft;
+    int direction = player.turningLeft - player.turningRight;
     player.roty += playerTurningSpeed*direction;
     if (player.roty % 90 == 0){
+        printf("ANG:%d\n",player.roty);
         player.turningRight = false;
         player.turningLeft = false;
     }
@@ -108,11 +109,12 @@ void PlayerTurn(){
 }
 
 void PlayerMove(){
+    printf("POS x:%f z:%f\n",player.x,player.z);
     int direction = player.goingForward - player.goingBackward;
-    player.speedX = playerMoveSpeed * sin(player.roty*PI/180);
-    player.speedZ = -playerMoveSpeed * cos(player.roty*PI/180);
-    float newX = player.x + player.speedX*direction;
-    float newZ = player.z + player.speedZ*direction;
+    player.speedX = playerMoveSpeed*direction * cosD(player.roty);
+    player.speedZ = -playerMoveSpeed*direction * sinD(player.roty);
+    float newX = player.x + player.speedX;
+    float newZ = player.z + player.speedZ;
     if (!hasTypeAt(newX, newZ, playerRadius, BLOCK)){
         player.x = newX;
         player.z = newZ;
@@ -146,31 +148,30 @@ void PlayerShoveEnemies() {
         return;
 
     player.lastShoveTime = time(NULL);
-
-    int dir = player.roty / 90;
+    PlaySound(TEXT("../../res/sounds/shotgun.wav"), NULL, SND_ASYNC|SND_FILENAME);
     float startX, startZ, endX, endZ;
 
-    float blastWidth = 0.1, blastDepth = 3;
-    switch (dir) {
-    case 0:
-        startX = player.x - blastWidth/2;
-        endX = player.x + blastWidth/2;
-        startZ = player.z;
-        endZ = player.z - blastDepth;
-        break;
-    case 1:
-        startX = player.x;
-        endX = player.x + blastDepth;
-        startZ = player.z - blastWidth/2;
-        endZ = player.z + blastWidth/2;
-        break;
-    case 2:
+    float blastWidth = 0.3, blastDepth = 3;
+    switch (player.roty) {
+    case S:
         startX = player.x - blastWidth/2;
         endX = player.x + blastWidth/2;
         startZ = player.z;
         endZ = player.z + blastDepth;
         break;
-    case 3:
+    case E:
+        startX = player.x;
+        endX = player.x + blastDepth;
+        startZ = player.z - blastWidth/2;
+        endZ = player.z + blastWidth/2;
+        break;
+    case N:
+        startX = player.x - blastWidth/2;
+        endX = player.x + blastWidth/2;
+        startZ = player.z;
+        endZ = player.z - blastDepth;
+        break;
+    case W:
         startX = player.x;
         endX = player.x - blastDepth;
         startZ = player.z - blastWidth/2;
@@ -196,16 +197,13 @@ void PlayerShoveEnemies() {
 
             enemies[i].shoveSpeedZ = 0;
             enemies[i].shoveSpeedX = 0;
-            if (dir == 0)
-                enemies[i].shoveSpeedZ = - enemyShoveSpeed;
-            else if (dir == 1)
-                enemies[i].shoveSpeedX = enemyShoveSpeed;
-            else if (dir == 2)
-                enemies[i].shoveSpeedZ = enemyShoveSpeed;
-            else if (dir == 3)
-                enemies[i].shoveSpeedX = - enemyShoveSpeed;
+            switch(player.roty){
+            case N: enemies[i].shoveSpeedZ = -enemyShoveSpeed; break;
+            case S: enemies[i].shoveSpeedZ = enemyShoveSpeed; break;
+            case W: enemies[i].shoveSpeedX = -enemyShoveSpeed; break;
+            case E: enemies[i].shoveSpeedX = enemyShoveSpeed;
+            }
         }
-
 }
 
 void PlayerDrill() {
@@ -218,19 +216,16 @@ void PlayerDrill() {
     }
     if (player.drillingTime < 14)
         return;
-    PlaySound(TEXT("../../res/jackhammer.wav"), NULL, SND_ASYNC|SND_FILENAME);
+    PlaySound(TEXT("../../res/sounds/jackhammer.wav"), NULL, SND_ASYNC|SND_FILENAME);
     if (getTileXZ(player.x, player.z) != HOLE)
         return;
-    int dir = player.roty / 90;
     int zIncrement = 0, xIncrement = 0;
-    if (dir == 0)
-        zIncrement = -1;
-    else if (dir == 1)
-        xIncrement = 1;
-    else if (dir == 2)
-        zIncrement = 1;
-    else
-        xIncrement = -1;
+    switch(player.roty){
+    case N: zIncrement=-1; break;
+    case S: zIncrement=1; break;
+    case E: xIncrement=1; break;
+    case W: xIncrement=-1; break;
+    }
 
     Position start = getPositionXZ(player.x, player.z);
     do {
@@ -279,12 +274,12 @@ bool PlayerEnemyCollision(){
 void PlayerDraw() {
     glPushMatrix();
 
-        float eyeY = player.y + 0.119 + 0.025 * std::abs(sin(player.headPosAux*PI/180));
+        float eyeY = player.y + 0.119 + 0.025 * std::abs(sinD(player.headPosAux));
 
         glTranslatef(player.x, eyeY, player.z);
         glRotatef(player.rotx, 1, 0, 0);
-        glRotatef(180 - player.roty, 0, 1, 0);
-        glmDraw(player.model, GLM_SMOOTH);
+        glRotatef(player.roty+270, 0, 1, 0);
+        glmDraw(player.model, GLM_SMOOTH | GLM_MATERIAL | GLM_TEXTURE);
     glPopMatrix();
 }
 
