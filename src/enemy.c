@@ -166,6 +166,8 @@ void EnemyMove(Enemy* e){
 bool EnemyCanMoveTo(float x, float z, int id){
     return (!hasTypeAt(x, z, enemyRadius, BLOCK) &&
             !hasTypeAt(x, z, enemyRadius, EMPTY) &&
+            !hasTypeAt(x, z, enemyRadius, CRACK) &&
+            !hasTypeAt(x, z, enemyRadius, HOLE) &&
             !EnemyEnemyCollision(x, z, id));
 }
 

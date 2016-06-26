@@ -505,7 +505,7 @@ int floodFill2(int* matrix, int i, int j, int value) {
 }
 
 bool shouldEliminateBlock(int* matrix, int i, int j, int largestPartition) {
-    return matrix[i + j * m.width] == -3 || (matrix[i + j * m.width] > 0 && matrix[i + j * m.width] != largestPartition);
+    return matrix[i + j * m.width] > 0 && matrix[i + j * m.width] != largestPartition;
 }
 
 void eliminatePartitions() {
@@ -570,7 +570,7 @@ void eliminatePartitions() {
                     shouldEliminateBlock(parts, i-1, j  , maxSizePartition) ||
                     shouldEliminateBlock(parts, i  , j-1, maxSizePartition) ||
                     shouldEliminateBlock(parts, i+1, j  , maxSizePartition) ||
-                    shouldEliminateBlock(parts, i  , j+1, maxSizePartition))
+                    shouldEliminateBlock(parts, i  , j+1, maxSizePartition)))
                 setTile(i, j, EMPTY);
             else if (shouldEliminateBlock(parts, i-1, j-1, maxSizePartition) &&
                     shouldEliminateBlock(parts, i  , j-1, maxSizePartition) &&
