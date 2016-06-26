@@ -508,6 +508,10 @@ bool shouldEliminateBlock(int* matrix, int i, int j, int largestPartition) {
     return matrix[i + j * m.width] > 0 && matrix[i + j * m.width] != largestPartition;
 }
 
+bool willBeEmpty(int* matrix, int i, int j, int largestPartition) {
+    return matrix[i + j * m.width] == -3 || (matrix[i + j * m.width] > 0 && matrix[i + j * m.width] != largestPartition);
+}
+
 void eliminatePartitions() {
 
     int parts[m.width*m.width];
@@ -566,10 +570,16 @@ void eliminatePartitions() {
                     shouldEliminateBlock(parts, i  , j+1, maxSizePartition) ||
                     shouldEliminateBlock(parts, i+1, j+1, maxSizePartition)))
                 setTile(i, j, EMPTY);
+            else if (parts[i + j * m.width] == -2 && (
+                    willBeEmpty(parts, i-1, j  , maxSizePartition) +
+                    willBeEmpty(parts, i+1, j  , maxSizePartition) +
+                    willBeEmpty(parts, i  , j-1, maxSizePartition) +
+                    willBeEmpty(parts, i  , j+1, maxSizePartition) > 2))
+                setTile(i, j, EMPTY);
             else if (parts[i + j * m.width] == -1 && (
-                    shouldEliminateBlock(parts, i-1, j  , maxSizePartition) ||
-                    shouldEliminateBlock(parts, i  , j-1, maxSizePartition) ||
-                    shouldEliminateBlock(parts, i+1, j  , maxSizePartition) ||
+                    shouldEliminateBlock(parts, i-1, j  , maxSizePartition) &&
+                    shouldEliminateBlock(parts, i  , j-1, maxSizePartition) &&
+                    shouldEliminateBlock(parts, i+1, j  , maxSizePartition) &&
                     shouldEliminateBlock(parts, i  , j+1, maxSizePartition)))
                 setTile(i, j, EMPTY);
             else if (shouldEliminateBlock(parts, i-1, j-1, maxSizePartition) &&
