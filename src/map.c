@@ -504,6 +504,10 @@ int floodFill2(int* matrix, int i, int j, int value) {
     return ret;
 }
 
+bool shouldEliminateBlock(int* matrix, int i, int j, int largestPartition) {
+    return matrix[i + j * m.width] == -3 || (matrix[i + j * m.width] > 0 && matrix[i + j * m.width] != largestPartition);
+}
+
 void eliminatePartitions() {
 
     int parts[m.width*m.width];
@@ -511,8 +515,10 @@ void eliminatePartitions() {
     for (i = 0; i < m.width; i++)
         for (j = 0; j < m.width; j++)
             if (getTile(i, j) == EMPTY)
+                parts[i + j * m.width] = -3;
+             else if (getTile(i, j) == CRACK)
                 parts[i + j * m.width] = -2;
-            else if (getTile(i, j) == CRACK || getTile(i, j) == HOLE)
+            else if (getTile(i, j) == HOLE)
                 parts[i + j * m.width] = -1;
             else
                 parts[i + j * m.width] = 0;
@@ -530,6 +536,9 @@ void eliminatePartitions() {
                     seedI = i;
                     seedJ = j;
                 }
+        if (!isPartitionable)
+            break;
+
         partitions++;
 
         int size = floodFill2(parts, seedI, seedJ, partitions);
@@ -540,8 +549,30 @@ void eliminatePartitions() {
         }
     } while (isPartitionable);
 
+    if (partitions == 1)
+        return;
+
     for (i = m.width-1; i >= 0; i--)
         for (j = 0; j < m.width; j++)
-            if (parts[i + j * m.width] > 0 && parts[i + j * m.width] != maxSizePartition)
+            if (shouldEliminateBlock(parts, i, j, maxSizePartition))
+                setTile(i, j, EMPTY);
+            else if (parts[i + j * m.width] == -2 && (
+                    shouldEliminateBlock(parts, i-1, j-1, maxSizePartition) ||
+                    shouldEliminateBlock(parts, i  , j-1, maxSizePartition) ||
+                    shouldEliminateBlock(parts, i+1, j-1, maxSizePartition) ||
+                    shouldEliminateBlock(parts, i-1, j  , maxSizePartition) ||
+                    shouldEliminateBlock(parts, i+1, j  , maxSizePartition) ||
+                    shouldEliminateBlock(parts, i-1, j+1, maxSizePartition) ||
+                    shouldEliminateBlock(parts, i  , j+1, maxSizePartition) ||
+                    shouldEliminateBlock(parts, i+1, j+1, maxSizePartition)))
+                setTile(i, j, EMPTY);
+            else if (shouldEliminateBlock(parts, i-1, j-1, maxSizePartition) &&
+                    shouldEliminateBlock(parts, i  , j-1, maxSizePartition) &&
+                    shouldEliminateBlock(parts, i+1, j-1, maxSizePartition) &&
+                    shouldEliminateBlock(parts, i-1, j  , maxSizePartition) &&
+                    shouldEliminateBlock(parts, i+1, j  , maxSizePartition) &&
+                    shouldEliminateBlock(parts, i-1, j+1, maxSizePartition) &&
+                    shouldEliminateBlock(parts, i  , j+1, maxSizePartition) &&
+                    shouldEliminateBlock(parts, i+1, j+1, maxSizePartition))
                 setTile(i, j, EMPTY);
 }
