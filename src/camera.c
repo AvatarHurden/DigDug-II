@@ -44,9 +44,8 @@ void CameraUpdate(bool isMiniMap) {
         camera.centerZ = 4;
         gluLookAt(camera.eyeX,camera.eyeY,camera.eyeZ,camera.centerX,camera.centerY,camera.centerZ,0.0,0.0,-1.0);
         camera.type = t;
-        return;
     }
-    if (player.isDead){
+    else if (player.isDead){
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
         camera.eyeX = player.x;
@@ -55,26 +54,30 @@ void CameraUpdate(bool isMiniMap) {
         camera.centerX = player.x;
         camera.centerY = 0;
         camera.centerZ = player.z;
-
         gluPerspective(45.0f,camera.windowWidth/camera.windowHeight,0.1f, 100.0f);
-        gluLookAt(camera.eyeX,camera.eyeY,camera.eyeZ,camera.centerX,camera.centerY,camera.centerZ,0.0,0.0,1.0);
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
-        return;
+        gluLookAt(camera.eyeX,camera.eyeY,camera.eyeZ,camera.centerX,camera.centerY,camera.centerZ,0.0,0.0,1.0);
+    } else{
+        switch(camera.type){
+        case FIRSTPERSON:
+            CameraAtPlayer();
+            CameraLookAtHorizon();
+            gluLookAt(camera.eyeX,camera.eyeY,camera.eyeZ,camera.centerX,camera.centerY,camera.centerZ,0.0,1.0,0.0);
+            break;
+        case THIRDPERSON:
+            CameraBehindPlayer();
+            CameraLookInFront();
+            gluLookAt(camera.eyeX,camera.eyeY,camera.eyeZ,camera.centerX,camera.centerY,camera.centerZ,0.0,1.0,0.0);
+            break;
+        case TOPDOWN:
+            CameraAbovePlayer();
+            CameraLookAtPlayer();
+            gluLookAt(camera.eyeX,camera.eyeY,camera.eyeZ,camera.centerX,camera.centerY,camera.centerZ,0.0,0.0,-1.0);
+        }
     }
-    if (camera.type == FIRSTPERSON) {
-        CameraAtPlayer();
-        CameraLookAtHorizon();
-        gluLookAt(camera.eyeX,camera.eyeY,camera.eyeZ,camera.centerX,camera.centerY,camera.centerZ,0.0,1.0,0.0);
-    } else if (camera.type == THIRDPERSON) {
-        CameraBehindPlayer();
-        CameraLookInFront();
-        gluLookAt(camera.eyeX,camera.eyeY,camera.eyeZ,camera.centerX,camera.centerY,camera.centerZ,0.0,1.0,0.0);
-    } else if (camera.type == TOPDOWN) {
-        CameraAbovePlayer();
-        CameraLookAtPlayer();
-        gluLookAt(camera.eyeX,camera.eyeY,camera.eyeZ,camera.centerX,camera.centerY,camera.centerZ,0.0,0.0,-1.0);
-    }
+    GLfloat light_position[] = {camera.eyeX, 10.0, camera.eyeZ, 0.0 };
+    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
 }
 
 void CameraSetType(cameraType type){

@@ -103,7 +103,7 @@ void EnemyUpdate(Enemy* e, Position pPos) {
         EnemyShove(e);
         return;
     }
-    if (e->turningRight ^ e->turningLeft) {
+    if (e->turningRight || e->turningLeft) {
         EnemyTurn(e);
         return;
     }
@@ -165,7 +165,7 @@ void EnemyMove(Enemy* e){
     if (EnemyCanMoveTo(newX, newZ, e->id)){
         e->x = newX;
         e->z = newZ;
-    } else {
+    } else if(!e->turningLeft){
         e->turningRight = true;
     }
 }
