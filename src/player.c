@@ -139,6 +139,7 @@ void PlayerFall(){
     if (player.isDead) return;
     if (player.y < -1){
         player.speedY = 0;
+        PlaySound(TEXT("../../res/sounds/splash.wav"), NULL, SND_ASYNC|SND_FILENAME);
         PlayerDie();
     }
     else{
