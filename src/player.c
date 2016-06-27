@@ -24,11 +24,12 @@ void PlayerDrill();
 bool PlayerEnemyCollision();
 void PlayerDie();
 void loadModel();
+void PlayerDeathAnimation();
 
 Player player;
 float playerMoveSpeed = 0.05;
 float playerTurningSpeed = 30; //deve ser divisor de 90
-float playerRadius = 0.15;
+float playerRadius = 0.18;
 
 void newPlayer(){
     printf("New Player.\n");
@@ -72,8 +73,10 @@ void loadModel() {
 void PlayerUpdate() {
     if (getTileXZ(player.x, player.z) == EMPTY)
         PlayerFall();
-    if (player.isDead)
+    if (player.isDead){
+        PlayerDeathAnimation();
         return;
+    }
     if (PlayerEnemyCollision()){
         PlayerDie();
         return;
@@ -257,7 +260,6 @@ void PlayerDrill() {
 
 void PlayerDie(){
     player.roty = 0;
-    player.rotx = 90.0;
     player.isDead = true;
 }
 
@@ -280,7 +282,7 @@ void PlayerDraw() {
 
         glTranslatef(player.x, eyeY, player.z);
         glRotatef(player.rotx, 1, 0, 0);
-        glRotatef(player.roty+270, 0, 1, 0);
+        glRotatef(player.roty+90, 0, 1, 0);
         glmDraw(player.model, GLM_SMOOTH | GLM_MATERIAL | GLM_TEXTURE);
     glPopMatrix();
 }
@@ -321,4 +323,11 @@ void setPlayerPosition() {
                 player.x = i * m.tileSize + m.tileSize/2.0;
                 player.z = j * m.tileSize + m.tileSize/2.0;
             }
+}
+
+float rotxspd = 5;
+void PlayerDeathAnimation(){
+    if (player.rotx+rotxspd > 90) {player.rotx=90; return; }
+    printf("AA");
+    player.rotx += rotxspd;
 }
