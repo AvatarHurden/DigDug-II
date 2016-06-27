@@ -39,7 +39,7 @@ Map* getMap(){ return &m; }
 Map cloneMap(){ return m; }
 int MapGetNumEnemies() { return m.numEnemies; }
 
-float gravity = 0.05;
+float gravity = 0.01;
 float blockSize = 0.4;
 char* lower_file_name = "../../res/lower.bmp";
 char* upper_file_name = "../../res/upper.bmp";
@@ -451,7 +451,7 @@ void drawCrack(int i, int j) {
 
 void drawWall(int i, int j, int level, int direction) {
 
-   if (level == 1)
+    if (level == 1)
         glBindTexture(GL_TEXTURE_2D, m.bloco_lateral);
     else
         glBindTexture(GL_TEXTURE_2D, m.chao_lateral);
