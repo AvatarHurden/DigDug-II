@@ -63,7 +63,7 @@ void initLight() {
 	GLfloat light_ambient[] = { backgrundColor[0], backgrundColor[1], backgrundColor[2], backgrundColor[3] };
 	GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
 	GLfloat light_specular[] = { 1.0, 1.0, 1.0, 1.0 };
-	GLfloat light_position[] = {4.0, 10.0, 4.0, 1.0 };
+	GLfloat light_position[] = {4.0, 2.0, 4.0, 1.0 };
 
 	glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
@@ -84,6 +84,8 @@ void mainInit() {
 }
 
 void newGame(){
+    if (!PlaySound(TEXT("../../res/sounds/victory.wav"), NULL, SND_ASYNC|SND_FILENAME))
+        PlaySound(TEXT("../../res/sounds/victory.wav"), NULL, SND_ASYNC|SND_FILENAME);
     glClearColor(1.0,1.0,1.0,0.0);
 	glColor3f(0.0f,0.0f,0.0f);
 	setViewport(0, windowWidth, 0, windowHeight);
@@ -198,7 +200,6 @@ int main(int argc, char **argv) {
 	subWindowId = glutCreateSubWindow(mainWindowId, 0, 0,windowWidth/3, windowHeight/3);
     glutDisplayFunc(miniMapRender);
     mainInit();
-
 	glutMainLoop();
 
     return 0;

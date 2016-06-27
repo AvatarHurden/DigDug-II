@@ -57,20 +57,8 @@ void CameraUpdate(bool isMiniMap) {
         CameraStartAnimation();
     } else if (aliveEnemies == 0){
         CameraVictoryAnimation();
-    } else if (player.isDead){
+    } else if (player.isDead || aliveEnemies == 0){
         CameraVictoryAnimation();
-//        glMatrixMode(GL_PROJECTION);
-//        glLoadIdentity();
-//        camera.eyeX = player.x;
-//        camera.eyeY = 4;
-//        camera.eyeZ = player.z;
-//        camera.centerX = player.x;
-//        camera.centerY = 0;
-//        camera.centerZ = player.z;
-//        gluPerspective(45.0f,camera.windowWidth/camera.windowHeight,0.1f, 100.0f);
-//        glMatrixMode(GL_MODELVIEW);
-//        glLoadIdentity();
-//        gluLookAt(camera.eyeX,camera.eyeY,camera.eyeZ,camera.centerX,camera.centerY,camera.centerZ,0.0,0.0,1.0);
     } else{
         switch(camera.type){
         case FIRSTPERSON:

@@ -82,7 +82,8 @@ void PlayerUpdate() {
         return;
     }
     if (aliveEnemies == 0) {
-        player.isDead = true;
+        if (!PlaySound(TEXT("../../res/sounds/victory.wav"), NULL, SND_ASYNC|SND_FILENAME|SND_LOOP|SND_NOSTOP))
+            PlaySound(TEXT("../../res/sounds/victory.wav"), NULL, SND_ASYNC|SND_FILENAME|SND_LOOP|SND_NOSTOP);
         return;
     }
     if (player.drilling) {
@@ -261,6 +262,7 @@ void PlayerDrill() {
 
 void PlayerDie(){
     player.roty = 0;
+    PlaySound(TEXT("../../res/sounds/defeat.wav"), NULL, SND_ASYNC|SND_FILENAME|SND_LOOP);
     player.isDead = true;
 }
 
@@ -329,6 +331,5 @@ void setPlayerPosition() {
 float rotxspd = 5;
 void PlayerDeathAnimation(){
     if (player.rotx+rotxspd > 90) {player.rotx=90; return; }
-    printf("AA");
     player.rotx += rotxspd;
 }
