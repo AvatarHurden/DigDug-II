@@ -172,7 +172,7 @@ void EnemyMove(Enemy* e){
 
 bool EnemyCanMoveTo(float x, float z, int id){
     return (!hasTypeAt(x, z, enemyRadius, BLOCK) &&
-            !hasTypeAt(x, z, enemyRadius, EMPTY) &&
+            getTileXZ(x,z)!=EMPTY &&
             !hasTypeAt(x, z, enemyRadius, CRACK) &&
             !hasTypeAt(x, z, enemyRadius, HOLE) &&
             !EnemyEnemyCollision(x, z, id));
@@ -215,9 +215,7 @@ void EnemyDecideAction(Enemy* e, Position pPos){
         EnemyChasePlayer(e, pPos);
     }
     else {
-        printf("DEBOA\n");
         if (time(NULL) - e->lastTurnTime > e->walkingTime) {
-            printf("VIRADA ALEATORIA\n");
             EnemyTurnRandom(e);
             e->lastTurnTime = time(NULL);
             e->walkingTime = rand() % 3 + 1;
@@ -226,7 +224,6 @@ void EnemyDecideAction(Enemy* e, Position pPos){
 }
 
 void EnemyChasePlayer(Enemy* e, Position pPos){
-    printf("PPERSEGUINDO\n");
     Position ePos = getPositionXZ(e->x, e->z);
     if(abs(pPos.x-ePos.x)>abs(pPos.z-ePos.z)){ //Se a distancia X for maior
         if (pPos.x>ePos.x){ //Se o x do jogador é maior
