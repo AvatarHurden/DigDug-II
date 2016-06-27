@@ -22,15 +22,23 @@ void CameraBehindPlayer();
 void CameraLookInFront();
 void CameraAbovePlayer();
 void CameraLookAtPlayer();
+void CameraStartAnimation();
+void CameraVictoryAnimation();
 
 Camera camera;
 float orthoWidth = 7.0/2;
+bool cameraStartAnimation;
+float cameraAuxX, cameraAuxY, cameraAuxZ, cameraAuxRotY=0;
 
 void newCamera(int width, int height){
     printf("New Camera.\n");
     camera.windowWidth = width;
     camera.windowHeight = height;
     CameraSetType(FIRSTPERSON);
+    cameraAuxX = player.x+5;
+    cameraAuxY = player.y+5;
+    cameraAuxZ = player.z+5;
+    cameraStartAnimation = true;
 }
 void CameraUpdate(bool isMiniMap) {
     if (isMiniMap){
@@ -45,19 +53,24 @@ void CameraUpdate(bool isMiniMap) {
         gluLookAt(camera.eyeX,camera.eyeY,camera.eyeZ,camera.centerX,camera.centerY,camera.centerZ,0.0,0.0,-1.0);
         camera.type = t;
     }
-    else if (player.isDead){
-        glMatrixMode(GL_PROJECTION);
-        glLoadIdentity();
-        camera.eyeX = player.x;
-        camera.eyeY = 4;
-        camera.eyeZ = player.z;
-        camera.centerX = player.x;
-        camera.centerY = 0;
-        camera.centerZ = player.z;
-        gluPerspective(45.0f,camera.windowWidth/camera.windowHeight,0.1f, 100.0f);
-        glMatrixMode(GL_MODELVIEW);
-        glLoadIdentity();
-        gluLookAt(camera.eyeX,camera.eyeY,camera.eyeZ,camera.centerX,camera.centerY,camera.centerZ,0.0,0.0,1.0);
+    else if (cameraStartAnimation){
+        CameraStartAnimation();
+    } else if (aliveEnemies == 0){
+        CameraVictoryAnimation();
+    } else if (player.isDead){
+        CameraVictoryAnimation();
+//        glMatrixMode(GL_PROJECTION);
+//        glLoadIdentity();
+//        camera.eyeX = player.x;
+//        camera.eyeY = 4;
+//        camera.eyeZ = player.z;
+//        camera.centerX = player.x;
+//        camera.centerY = 0;
+//        camera.centerZ = player.z;
+//        gluPerspective(45.0f,camera.windowWidth/camera.windowHeight,0.1f, 100.0f);
+//        glMatrixMode(GL_MODELVIEW);
+//        glLoadIdentity();
+//        gluLookAt(camera.eyeX,camera.eyeY,camera.eyeZ,camera.centerX,camera.centerY,camera.centerZ,0.0,0.0,1.0);
     } else{
         switch(camera.type){
         case FIRSTPERSON:
@@ -114,9 +127,9 @@ void CameraChangeType() {
 }
 
 void CameraAtPlayer(){
-    camera.eyeX = player.x - 0.01*cosD(player.roty);
+    camera.eyeX = player.x + 0.07*cosD(player.roty);
     camera.eyeY = player.y + 0.2 + 0.025 * std::abs(sinD(player.headPosAux));
-    camera.eyeZ = player.z + 0.01*sinD(player.roty);
+    camera.eyeZ = player.z - 0.07*sinD(player.roty);
 }
 void CameraLookAtHorizon(){
     camera.centerX = camera.eyeX + cosD(player.roty);
@@ -124,9 +137,9 @@ void CameraLookAtHorizon(){
     camera.centerZ = camera.eyeZ - sinD(player.roty);
 }
 void CameraBehindPlayer(){
-    camera.eyeX = player.x - 0.5*cosD(player.roty);
-    camera.eyeY = player.y + 0.4 + 0.025 * std::abs(sinD(player.headPosAux));
-    camera.eyeZ = player.z + 0.5*sinD(player.roty);
+    camera.eyeX = player.x - 0.6*cosD(player.roty);
+    camera.eyeY = player.y + 0.45 + 0.025 * std::abs(sinD(player.headPosAux));
+    camera.eyeZ = player.z + 0.6*sinD(player.roty);
 }
 void CameraLookInFront(){
     camera.centerX = player.x;
@@ -148,4 +161,27 @@ void CameraResize(int w, int h){
     camera.windowWidth = w;
     camera.windowHeight = h;
     CameraSetType(camera.type);
+}
+
+void CameraStartAnimation(){
+    camera.eyeX = cameraAuxX;
+    camera.eyeY = cameraAuxY;
+    camera.eyeZ = cameraAuxZ;
+    CameraLookInFront();
+    gluLookAt(camera.eyeX,camera.eyeY,camera.eyeZ,camera.centerX,camera.centerY,camera.centerZ,0.0,1.0,.0);
+    cameraAuxZ -= 0.1;
+    if(cameraAuxY-0.15>player.y + 0.4) cameraAuxY -= 0.15;
+    else cameraAuxY = player.y + 0.4;
+    if (cameraAuxX-0.2 > player.x) cameraAuxX -= 0.2;
+    else cameraAuxX = player.x;
+    if(camera.eyeZ<player.z+0.3) cameraStartAnimation = false;
+}
+void CameraVictoryAnimation(){
+    CameraSetType(THIRDPERSON);
+    camera.eyeX = player.x - 1.5*cosD(cameraAuxRotY);
+    camera.eyeY = player.y + 0.5;
+    camera.eyeZ = player.z + 1.5*sinD(cameraAuxRotY);
+    CameraLookAtPlayer();
+    gluLookAt(camera.eyeX,camera.eyeY,camera.eyeZ,camera.centerX,camera.centerY,camera.centerZ,0.0,1.0,.0);
+    cameraAuxRotY += 2;
 }

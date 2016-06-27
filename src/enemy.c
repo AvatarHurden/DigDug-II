@@ -193,6 +193,7 @@ void EnemyFall(Enemy* e){
         e->isDead = true;
         aliveEnemies--;
         printf("Alive: %d\n",aliveEnemies);
+        PlaySound(TEXT("../../res/sounds/splash.wav"), NULL, SND_ASYNC|SND_FILENAME);
     }
 }
 
